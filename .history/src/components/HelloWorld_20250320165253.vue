@@ -41,7 +41,7 @@
         <div class="feature-page">
           <h2>JSON 工具</h2>
           <p>JSON格式化、验证、压缩和转换工具</p>
-          <JsonTool />
+          <!-- JSON工具具体实现 -->
         </div>
       </div>
       
@@ -67,13 +67,8 @@
 </template>
 
 <script>
-import JsonTool from './JsonTool.vue';
-
 export default {
   name: 'HelloWorld',
-  components: {
-    JsonTool
-  },
   props: {
     msg: String
   },
@@ -314,8 +309,6 @@ export default {
   padding: 40px 20px;
   box-sizing: border-box;
   text-align: center;
-  display: flex;
-  flex-direction: column;
 }
 
 .feature-page h2 {
@@ -330,12 +323,6 @@ export default {
 
 .feature-page p {
   color: #666;
-  margin-bottom: 20px;
-}
-
-/* 功能工具占据剩余空间 */
-.feature-page > :last-child {
-  flex: 1;
-  margin-top: 10px;
+  margin-bottom: 30px;
 }
 </style>
