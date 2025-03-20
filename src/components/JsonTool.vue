@@ -5,6 +5,7 @@
       <div class="panel-header">
         <h3>JSON 输入</h3>
         <div class="panel-actions">
+          <button @click="insertExample" class="tool-button">示例</button>
           <button @click="clearInput" class="tool-button">清空</button>
           <button @click="formatInput" class="tool-button">格式化</button>
         </div>
@@ -118,7 +119,8 @@ export default {
       lineTypes: [], // 存储每行的类型 (object-start, array-start, object-end, array-end, key-value)
       hoveredLine: null, // 当前鼠标悬浮的行
       visibleJsonLines: [], // 当前显示的JSON行
-      completeJsonString: '' // 完整的JSON字符串（用于复制）
+      completeJsonString: '', // 完整的JSON字符串（用于复制）
+      exampleJson: '{"basic":{"name":"Coder Tools Platform","version":"1.0.0","description":"一个功能强大的开发者工具集合","author":{"name":"开发者","email":"dev@example.com","url":"https://example.com"},"license":"MIT","repository":"https://github.com/example/coder-tools-platform"},"features":[{"id":1,"name":"JSON工具","active":true,"capabilities":["格式化","验证","压缩","转换"],"usageCount":1284,"lastUsed":"2023-07-15T08:45:30.000Z"},{"id":2,"name":"时间戳转换","active":true,"capabilities":["Unix时间戳转换","ISO格式化","时区转换"],"usageCount":856,"lastUsed":"2023-07-14T15:22:12.000Z"},{"id":3,"name":"Java工具","active":true,"capabilities":["代码格式化","类结构分析","JSON转Java类"],"usageCount":542,"lastUsed":"2023-07-13T09:18:45.000Z"}],"config":{"theme":"light","fontSize":14,"autoSave":true,"notifications":false,"shortcuts":{"formatJson":"Ctrl+Shift+F","clearEditor":"Alt+C","saveContent":"Ctrl+S"},"dimensions":{"maxWidth":"1200px","sidebarWidth":"250px","mainContentWidth":"calc(100% - 250px)"},"api":{"baseUrl":"https://api.example.com/v1","timeout":30000,"retryAttempts":3,"headers":{"Authorization":"Bearer $TOKEN","Content-Type":"application/json","Accept-Language":"zh-CN"}}},"statistics":{"totalUsers":15420,"activeUsersToday":1240,"averageSessionTime":754.8,"popularFeatures":{"JSON工具":42.5,"时间戳转换":28.3,"Java工具":18.2,"其他":11.0},"growth":{"lastMonth":12.4,"lastQuarter":34.8,"lastYear":127.5}},"specialChars":"特殊字符测试: ~!@#$%^&*()_+`-=[]{}|;\':\\",./<>?","longText":"这是一个非常长的文本字段，用于测试JSON工具对长文本的处理能力。在实际应用中，我们可能会遇到包含大段文本的JSON数据，比如文章内容、日志记录、错误信息等。这些长文本可能会导致编辑器渲染变慢，所以一个好的JSON工具应该能够高效处理这类数据。同时，这也是对工具折叠功能的测试，看它是否能够正确地折叠和展开这样的长文本节点，提高用户在处理复杂JSON数据时的体验。","nestedObject":{"level1":{"level2":{"level3":{"level4":{"level5":{"value":"这是一个深度嵌套的对象，用于测试JSON工具的格式化和展示能力"}}}}}},"largeArray":[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50],"booleans":[true,false,true,false],"nullValue":null,"numberTypes":{"integer":42,"float":3.14159,"negative":-273.15,"scientific":6.022e23,"binary":10,"octal":493,"hex":255,"infinity":1.7976931348623157e+308},"dateTime":"2023-07-15T12:30:45.123Z","emptyValues":{"string":"","array":[],"object":{},"nullValue":null},"unicodeChars":"Unicode字符测试: 你好，世界！😊🌍🚀 こんにちは世界 안녕하세요 世界 Привет, мир!","base64Data":"SGVsbG8gV29ybGQgZnJvbSBCYXNlNjQgRW5jb2RlZCBTdHJpbmc=","urlEncoded":"https%3A%2F%2Fexample.com%2Fsearch%3Fq%3Djson%20tools%26lang%3Dzh-CN"}'
     }
   },
   mounted() {
@@ -520,6 +522,14 @@ export default {
     
     handleLineLeave() {
       this.hoveredLine = null;
+    },
+    insertExample() {
+      // 设置示例JSON
+      this.jsonInput = this.exampleJson;
+      // 处理JSON以显示在右侧
+      this.processJson();
+      // 提示用户
+      this.showToastMessage('已插入示例JSON数据');
     }
   }
 }
@@ -719,27 +729,20 @@ export default {
   padding: 15px;
   display: flex;
   flex-direction: column;
-  align-items: flex-start;
+  align-items: center; /* 居中显示错误框 */
+  justify-content: flex-start;
+  width: 100%;
 }
 
 .json-error {
   color: #d32f2f;
   text-align: left;
-  width: 100%;
+  width: 95%; /* 设置为95%宽度 */
   padding: 15px;
   border-radius: 8px;
   background-color: rgba(211, 47, 47, 0.05);
-}
-
-.error-title {
-  font-weight: bold;
-  font-size: 16px;
-  margin-bottom: 10px;
-}
-
-.error-message {
-  margin-bottom: 15px;
-  font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, Courier, monospace;
+  max-width: 95%; /* 确保不会超出容器 */
+  box-sizing: border-box;
 }
 
 /* 修复建议样式 */
