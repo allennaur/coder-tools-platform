@@ -35,6 +35,7 @@
           <button v-if="hasRepairSuggestion" @click="applyRepair" class="tool-button">修复</button>
           <button @click="compressJson" class="tool-button compress-button">压缩</button>
           <button @click="formatJson" class="tool-button format-button">格式化</button>
+          <button @click="convertToXml" class="tool-button xml-button">转换XML</button>
           <button @click="copyToClipboard" class="tool-button">复制</button>
         </div>
       </div>
@@ -121,7 +122,8 @@ export default {
       hoveredLine: null, // 当前鼠标悬浮的行
       visibleJsonLines: [], // 当前显示的JSON行
       completeJsonString: '', // 完整的JSON字符串（用于复制）
-      exampleJson: '{"basic":{"name":"Coder Tools Platform","version":"1.0.0","description":"一个功能强大的开发者工具集合","author":{"name":"开发者","email":"dev@example.com","url":"https://example.com"},"license":"MIT","repository":"https://github.com/example/coder-tools-platform"},"features":[{"id":1,"name":"JSON工具","active":true,"capabilities":["格式化","验证","压缩","转换"],"usageCount":1284,"lastUsed":"2023-07-15T08:45:30.000Z"},{"id":2,"name":"时间戳转换","active":true,"capabilities":["Unix时间戳转换","ISO格式化","时区转换"],"usageCount":856,"lastUsed":"2023-07-14T15:22:12.000Z"},{"id":3,"name":"Java工具","active":true,"capabilities":["代码格式化","类结构分析","JSON转Java类"],"usageCount":542,"lastUsed":"2023-07-13T09:18:45.000Z"}],"config":{"theme":"light","fontSize":14,"autoSave":true,"notifications":false,"shortcuts":{"formatJson":"Ctrl+Shift+F","clearEditor":"Alt+C","saveContent":"Ctrl+S"},"dimensions":{"maxWidth":"1200px","sidebarWidth":"250px","mainContentWidth":"calc(100% - 250px)"},"api":{"baseUrl":"https://api.example.com/v1","timeout":30000,"retryAttempts":3,"headers":{"Authorization":"Bearer $TOKEN","Content-Type":"application/json","Accept-Language":"zh-CN"}}},"statistics":{"totalUsers":15420,"activeUsersToday":1240,"averageSessionTime":754.8,"popularFeatures":{"JSON工具":42.5,"时间戳转换":28.3,"Java工具":18.2,"其他":11.0},"growth":{"lastMonth":12.4,"lastQuarter":34.8,"lastYear":127.5}},"specialChars":"特殊字符测试: ~!@#$%^&*()_+`-=[]{}|;\':\\",./<>?","longText":"这是一个非常长的文本字段，用于测试JSON工具对长文本的处理能力。在实际应用中，我们可能会遇到包含大段文本的JSON数据，比如文章内容、日志记录、错误信息等。这些长文本可能会导致编辑器渲染变慢，所以一个好的JSON工具应该能够高效处理这类数据。同时，这也是对工具折叠功能的测试，看它是否能够正确地折叠和展开这样的长文本节点，提高用户在处理复杂JSON数据时的体验。","nestedObject":{"level1":{"level2":{"level3":{"level4":{"level5":{"value":"这是一个深度嵌套的对象，用于测试JSON工具的格式化和展示能力"}}}}}},"largeArray":[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50],"booleans":[true,false,true,false],"nullValue":null,"numberTypes":{"integer":42,"float":3.14159,"negative":-273.15,"scientific":6.022e23,"binary":10,"octal":493,"hex":255,"infinity":1.7976931348623157e+308},"dateTime":"2023-07-15T12:30:45.123Z","emptyValues":{"string":"","array":[],"object":{},"nullValue":null},"unicodeChars":"Unicode字符测试: 你好，世界！😊🌍🚀 こんにちは世界 안녕하세요 世界 Привет, мир!","base64Data":"SGVsbG8gV29ybGQgZnJvbSBCYXNlNjQgRW5jb2RlZCBTdHJpbmc=","urlEncoded":"https%3A%2F%2Fexample.com%2Fsearch%3Fq%3Djson%20tools%26lang%3Dzh-CN"}'
+      exampleJson: '{"basic":{"name":"Coder Tools Platform","version":"1.0.0","description":"一个功能强大的开发者工具集合","author":{"name":"开发者","email":"dev@example.com","url":"https://example.com"},"license":"MIT","repository":"https://github.com/example/coder-tools-platform"},"features":[{"id":1,"name":"JSON工具","active":true,"capabilities":["格式化","验证","压缩","转换"],"usageCount":1284,"lastUsed":"2023-07-15T08:45:30.000Z"},{"id":2,"name":"时间戳转换","active":true,"capabilities":["Unix时间戳转换","ISO格式化","时区转换"],"usageCount":856,"lastUsed":"2023-07-14T15:22:12.000Z"},{"id":3,"name":"Java工具","active":true,"capabilities":["代码格式化","类结构分析","JSON转Java类"],"usageCount":542,"lastUsed":"2023-07-13T09:18:45.000Z"}],"config":{"theme":"light","fontSize":14,"autoSave":true,"notifications":false,"shortcuts":{"formatJson":"Ctrl+Shift+F","clearEditor":"Alt+C","saveContent":"Ctrl+S"},"dimensions":{"maxWidth":"1200px","sidebarWidth":"250px","mainContentWidth":"calc(100% - 250px)"},"api":{"baseUrl":"https://api.example.com/v1","timeout":30000,"retryAttempts":3,"headers":{"Authorization":"Bearer $TOKEN","Content-Type":"application/json","Accept-Language":"zh-CN"}}},"statistics":{"totalUsers":15420,"activeUsersToday":1240,"averageSessionTime":754.8,"popularFeatures":{"JSON工具":42.5,"时间戳转换":28.3,"Java工具":18.2,"其他":11.0},"growth":{"lastMonth":12.4,"lastQuarter":34.8,"lastYear":127.5}},"specialChars":"特殊字符测试: ~!@#$%^&*()_+`-=[]{}|;\':\\",./<>?","longText":"这是一个非常长的文本字段，用于测试JSON工具对长文本的处理能力。在实际应用中，我们可能会遇到包含大段文本的JSON数据，比如文章内容、日志记录、错误信息等。这些长文本可能会导致编辑器渲染变慢，所以一个好的JSON工具应该能够高效处理这类数据。同时，这也是对工具折叠功能的测试，看它是否能够正确地折叠和展开这样的长文本节点，提高用户在处理复杂JSON数据时的体验。","nestedObject":{"level1":{"level2":{"level3":{"level4":{"level5":{"value":"这是一个深度嵌套的对象，用于测试JSON工具的格式化和展示能力"}}}}}},"largeArray":[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50],"booleans":[true,false,true,false],"nullValue":null,"numberTypes":{"integer":42,"float":3.14159,"negative":-273.15,"scientific":6.022e23,"binary":10,"octal":493,"hex":255,"infinity":1.7976931348623157e+308},"dateTime":"2023-07-15T12:30:45.123Z","emptyValues":{"string":"","array":[],"object":{},"nullValue":null},"unicodeChars":"Unicode字符测试: 你好，世界！😊🌍🚀 こんにちは世界 안녕하세요 世界 Привет, мир!","base64Data":"SGVsbG8gV29ybGQgZnJvbSBCYXNlNjQgRW5jb2RlZCBTdHJpbmc=","urlEncoded":"https%3A%2F%2Fexample.com%2Fsearch%3Fq%3Djson%20tools%26lang%3Dzh-CN"}',
+      isXmlMode: false // 标记当前是否为XML显示模式
     }
   },
   mounted() {
@@ -168,6 +170,9 @@ export default {
       }
     },
     processJson() {
+      // 重置XML模式
+      this.isXmlMode = false;
+      
       if (!this.jsonInput.trim()) {
         this.formattedJson = [];
         this.visibleJsonLines = [];
@@ -337,6 +342,7 @@ export default {
       this.processJson();
     },
     clearInput() {
+      this.isXmlMode = false;
       this.jsonInput = '';
       this.formattedJson = [];
       this.visibleJsonLines = []; // 清空显示的行数据
@@ -542,6 +548,12 @@ export default {
       }
       
       try {
+        // 如果当前是XML模式，提示不支持
+        if (this.isXmlMode) {
+          this.showToastMessage('XML模式下无法压缩，请先返回JSON模式');
+          return;
+        }
+        
         // 解析当前JSON
         const parsedJson = JSON.parse(this.completeJsonString);
         
@@ -567,6 +579,12 @@ export default {
       }
       
       try {
+        // 如果当前是XML模式，先尝试转回JSON
+        if (this.isXmlMode) {
+          this.showToastMessage('XML模式下无法格式化，请先返回JSON模式');
+          return;
+        }
+        
         // 解析当前JSON
         const parsedJson = JSON.parse(this.completeJsonString);
         
@@ -583,6 +601,130 @@ export default {
         console.error('JSON格式化失败:', error);
         this.showToastMessage('JSON 格式化失败');
       }
+    },
+    // 将 JSON 转换为 XML
+    convertToXml() {
+      if (this.jsonError || !this.completeJsonString) {
+        return;
+      }
+      
+      try {
+        // 解析当前JSON
+        const parsedJson = JSON.parse(this.completeJsonString);
+        
+        // 转换为XML格式
+        const xml = this.jsonToXml(parsedJson);
+        
+        // 存储转换后的XML
+        this.jsonResult = xml;
+        this.completeJsonString = xml;
+        this.isXmlMode = true;
+        
+        // 在视图中显示XML
+        this.displayXml(xml);
+        
+        // 显示提示
+        this.showToastMessage('已转换为XML格式');
+      } catch (error) {
+        console.error('转换XML失败:', error);
+        this.showToastMessage('转换XML失败');
+      }
+    },
+    
+    // JSON转XML的核心算法
+    jsonToXml(obj, rootName = 'root') {
+      let xml = `<?xml version="1.0" encoding="UTF-8" ?>\n<${rootName}>\n`;
+      
+      // 递归处理JSON对象
+      const parseObject = (obj, indent = '  ') => {
+        let result = '';
+        
+        for (const key in obj) {
+          const value = obj[key];
+          
+          if (value === null || value === undefined) {
+            // 处理null值
+            result += `${indent}<${key} />\n`;
+          } else if (Array.isArray(value)) {
+            // 处理数组
+            if (value.length === 0) {
+              result += `${indent}<${key} />\n`;
+            } else {
+              for (const item of value) {
+                if (typeof item === 'object' && item !== null) {
+                  // 数组中的对象元素
+                  result += `${indent}<${key}>\n${parseObject(item, indent + '  ')}${indent}</${key}>\n`;
+                } else {
+                  // 数组中的简单元素
+                  result += `${indent}<${key}>${this.escapeXml(String(item))}</${key}>\n`;
+                }
+              }
+            }
+          } else if (typeof value === 'object') {
+            // 处理对象
+            result += `${indent}<${key}>\n${parseObject(value, indent + '  ')}${indent}</${key}>\n`;
+          } else {
+            // 处理基本类型
+            result += `${indent}<${key}>${this.escapeXml(String(value))}</${key}>\n`;
+          }
+        }
+        
+        return result;
+      };
+      
+      xml += parseObject(obj);
+      xml += `</${rootName}>`;
+      
+      return xml;
+    },
+    
+    // 转义XML特殊字符
+    escapeXml(unsafe) {
+      return unsafe
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&apos;');
+    },
+    
+    // 在视图中显示XML内容
+    displayXml(xml) {
+      // 使用HTML语法高亮显示XML
+      const formattedXml = xml
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/("(\\u[a-zA-Z0-9]{4}|\\[^u]|[^\\"])*"(\s*:)?|\b(true|false|null)\b|-?\d+(?:\.\d*)?(?:[eE][+-]?\d+)?)/g, match => match)
+        .split('\n');
+      
+      // 使用正则表达式高亮XML标签
+      const highlightedXml = formattedXml.map(line => {
+        return line.replace(/(&lt;\/?)([a-zA-Z0-9_:]+)(\s+[^&]*?)?(&gt;)/g, (match, p1, p2, p3, p4) => {
+          // p1 = 开始标签符号(&lt; 或 &lt;/)
+          // p2 = 标签名
+          // p3 = 属性部分 (如果有)
+          // p4 = 结束标签符号(&gt;)
+          return `${p1}<span class="xml-tag">${p2}</span>${p3 || ''}${p4}`;
+        });
+      });
+      
+      this.formattedJson = highlightedXml.map((line, index) => {
+        const indentMatch = line.match(/^\s*/);
+        const indent = indentMatch ? indentMatch[0].length : 0;
+        
+        return {
+          originalIndex: index,
+          content: line,
+          indent: Math.floor(indent / 2), // XML的缩进通常是2个空格
+          type: 'xml-line',
+          collapsed: false
+        };
+      });
+      
+      // 清空折叠状态并刷新显示
+      this.collapsedLines = new Set();
+      this.processVisibleLines();
     }
   }
 }
@@ -1022,5 +1164,33 @@ export default {
 
 .tool-button.compress-button:hover {
   background: linear-gradient(135deg, rgba(255, 152, 0, 0.2) 0%, rgba(255, 193, 7, 0.2) 100%);
+}
+
+/* XML转换按钮样式 */
+.tool-button.xml-button {
+  background: linear-gradient(135deg, rgba(156, 39, 176, 0.1) 0%, rgba(103, 58, 183, 0.1) 100%);
+  color: #6a1b9a;
+}
+
+.tool-button.xml-button:hover {
+  background: linear-gradient(135deg, rgba(156, 39, 176, 0.2) 0%, rgba(103, 58, 183, 0.2) 100%);
+}
+
+/* XML语法高亮 */
+:deep(.xml-tag) {
+  color: #0b75b8;
+}
+
+:deep(.xml-attr) {
+  color: #d7ba7d;
+}
+
+:deep(.xml-text) {
+  color: #006400;
+}
+
+:deep(.xml-comment) {
+  color: #808080;
+  font-style: italic;
 }
 </style>
