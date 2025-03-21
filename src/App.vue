@@ -22,8 +22,12 @@ export default {
   },
   provide() {
     return {
-      toast: this.toast
+      toast: this.toast // 提供toast服务给所有子组件
     }
+  },
+  mounted() {
+    // 确保ToastService可全局访问
+    window.$toast = ToastService;
   }
 }
 </script>
