@@ -54,9 +54,11 @@
         <!-- 时间戳工具内容 -->
         <div v-else-if="activeMenu === 'timestamp'" class="content-wrapper" key="timestamp">
           <div class="feature-page">
-            <h2>时间戳转换工具</h2>
-            <p>在不同时间格式之间快速转换</p>
-            <!-- 时间戳工具具体实现 -->
+            <div class="feature-header">
+              <h2>时间戳转换工具</h2>
+              <p>在不同时间格式之间快速转换，支持多种时区和精度</p>
+            </div>
+            <TimestampTool />
           </div>
         </div>
         
@@ -78,13 +80,15 @@
 <script>
 import JsonTool from './JsonTool.vue';
 import JavaTool from './JavaTool.vue';
+import TimestampTool from './TimestampTool.vue';
 import StorageService from '@/utils/StorageService';
 
 export default {
   name: 'HelloWorld',
   components: {
     JsonTool,
-    JavaTool
+    JavaTool,
+    TimestampTool
   },
   props: {
     msg: String
