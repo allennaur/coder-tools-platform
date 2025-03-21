@@ -6,7 +6,12 @@
         <h3>JSON 输入</h3>
         <div class="panel-actions">
           <button @click="insertExample" class="tool-button">示例</button>
-          <button @click="clearInput" class="tool-button">清空</button>
+          <button 
+            @click="clearInput" 
+            class="tool-button" 
+            :class="{ 'disabled': !hasInputContent }"
+            :disabled="!hasInputContent"
+          >清空</button>
         </div>
       </div>
       <textarea 
@@ -41,12 +46,42 @@
         </h3>
         <div class="panel-actions">
           <button v-if="hasRepairSuggestion" @click="applyRepair" class="tool-button">修复</button>
-          <button @click="compressJson" class="tool-button compress-button">压缩</button>
-          <button @click="formatJson" class="tool-button format-button">格式化</button>
-          <button @click="convertToXml" class="tool-button xml-button">转换XML</button>
-          <button @click="convertToYaml" class="tool-button yaml-button">转换YAML</button>
-          <button @click="convertToCsv" class="tool-button csv-button">转换CSV</button>
-          <button @click="copyToClipboard" class="tool-button">复制</button>
+          <button 
+            @click="compressJson" 
+            class="tool-button compress-button"
+            :class="{ 'disabled': !hasInputContent }" 
+            :disabled="!hasInputContent"
+          >压缩</button>
+          <button 
+            @click="formatJson" 
+            class="tool-button format-button"
+            :class="{ 'disabled': !hasInputContent }"
+            :disabled="!hasInputContent"
+          >格式化</button>
+          <button 
+            @click="convertToXml" 
+            class="tool-button xml-button"
+            :class="{ 'disabled': !hasInputContent }"
+            :disabled="!hasInputContent"
+          >转换XML</button>
+          <button 
+            @click="convertToYaml" 
+            class="tool-button yaml-button"
+            :class="{ 'disabled': !hasInputContent }"
+            :disabled="!hasInputContent"
+          >转换YAML</button>
+          <button 
+            @click="convertToCsv" 
+            class="tool-button csv-button"
+            :class="{ 'disabled': !hasInputContent }"
+            :disabled="!hasInputContent"
+          >转换CSV</button>
+          <button 
+            @click="copyToClipboard" 
+            class="tool-button"
+            :class="{ 'disabled': !hasOutputContent }"
+            :disabled="!hasOutputContent"
+          >复制</button>
         </div>
       </div>
       
@@ -142,6 +177,21 @@ export default {
       resizeRAF: null, // 用于requestAnimationFrame的ID
       lastResizeEvent: null, // 存储最后一个resize事件
       animationInProgress: false, // 标记是否有动画正在进行中
+    }
+  },
+  computed: {
+    // 判断是否有输入内容
+    hasInputContent() {
+      return !!this.jsonInput.trim();
+    },
+    
+    // 判断是否有输出内容可供复制
+    hasOutputContent() {
+      // 检查是否有处理结果或错误信息
+      if (this.jsonError) {
+        return !!this.jsonErrorMessage; // 错误信息也可以复制
+      }
+      return !!this.completeJsonString;
     }
   },
   mounted() {
@@ -388,6 +438,8 @@ export default {
       this.processJson();
     },
     clearInput() {
+      if (!this.hasInputContent) return; // 如果没有内容，不执行清空
+      
       this.resetAllFormatModes();
       this.isXmlMode = false;
       this.jsonInput = '';
@@ -402,6 +454,8 @@ export default {
       this.currentFormat = 'JSON';
     },
     copyToClipboard() {
+      if (!this.hasOutputContent) return;
+      
       // 使用完整的JSON字符串进行复制
       const textToCopy = this.jsonError ? '错误: ' + this.jsonErrorMessage : this.completeJsonString;
       
@@ -708,6 +762,8 @@ export default {
     },
     // 压缩JSON
     compressJson() {
+      if (!this.hasInputContent) return;
+      
       if (!this.jsonInput.trim()) {
         return;
       }
@@ -746,6 +802,8 @@ export default {
     
     // 格式化JSON
     formatJson() {
+      if (!this.hasInputContent) return;
+      
       if (!this.jsonInput.trim()) {
         return;
       }
@@ -783,6 +841,8 @@ export default {
     },
     // 将 JSON 转换为 XML
     convertToXml() {
+      if (!this.hasInputContent) return;
+      
       if (!this.jsonInput.trim()) {
         return;
       }
@@ -932,6 +992,8 @@ export default {
     },
     // 将 JSON 转换为 YAML
     convertToYaml() {
+      if (!this.hasInputContent) return;
+      
       if (!this.jsonInput.trim()) {
         return;
       }
@@ -1042,6 +1104,8 @@ export default {
     
     // 将 JSON 转换为 CSV
     convertToCsv() {
+      if (!this.hasInputContent) return;
+      
       if (!this.jsonInput.trim()) {
         return;
       }
@@ -1876,5 +1940,22 @@ export default {
   border-radius: 10px;
   display: inline-block;
   vertical-align: middle;
+}
+
+/* 添加禁用状态的按钮样式 */
+.tool-button.disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  transform: none !important;
+  background: rgba(0, 0, 0, 0.05) !important;
+  color: #999 !important;
+  box-shadow: none !important;
+}
+
+/* 确保禁用状态的按钮悬停时不会有交互效果 */
+.tool-button.disabled:hover {
+  background: rgba(0, 0, 0, 0.05) !important;
+  transform: none !important;
+  box-shadow: none !important;
 }
 </style>
