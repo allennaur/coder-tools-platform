@@ -7,6 +7,7 @@
            v-for="(menu, index) in menus" 
            :key="index" 
            :class="{ active: activeMenu === menu.id }"
+           :id="`menu-button-${menu.id}`"
            @click="switchMenu(menu.id)">
         <div class="menu-icon">
           <i :class="menu.icon"></i>
@@ -87,6 +88,7 @@ export default {
     return {
       activeMenu: 'home',
       hoverMenu: null,
+      activeMenuIndex: 0, // 添加一个索引跟踪，便于精确定位
       menus: [
         {
           id: 'home',
@@ -120,20 +122,40 @@ export default {
       const menuIndex = this.menus.findIndex(menu => menu.id === this.activeMenu);
       if (menuIndex === -1) return {};
       
-      // 计算当前选中按钮的位置 (每个按钮高度 + 间距)
-      const buttonHeight = 45; // 按钮高度
-      const gap = 15; // 按钮之间的间距
-      const offsetY = menuIndex * (buttonHeight + gap); // 不再加上顶部padding
-      
+      // 使用绝对定位，确保与按钮完全对齐
       return {
-        transform: `translateY(${offsetY}px) translateX(-50%)`,
+        top: `${menuIndex * 68 + 20}px`, // 20px是顶部内边距，68px是每个按钮的总高度(含间距)
         opacity: 1
       };
     }
   },
   methods: {
+    // 添加新方法来更新活动菜单索引
+    updateActiveMenuIndex() {
+      this.activeMenuIndex = this.menus.findIndex(menu => menu.id === this.activeMenu);
+    },
+    
     switchMenu(menuId) {
       this.activeMenu = menuId;
+      // 在状态更新后调用方法更新索引
+      this.$nextTick(() => {
+        this.updateActiveMenuIndex();
+        
+        const activeBtn = this.$el.querySelector('.menu-button.active');
+        if (activeBtn) {
+          // 根据实际按钮位置调整指示器位置
+          const rect = activeBtn.getBoundingClientRect();
+          const sidebar = this.$el.querySelector('.sidebar');
+          const sidebarRect = sidebar.getBoundingClientRect();
+          const top = rect.top - sidebarRect.top;
+          
+          // 更新指示器样式
+          const indicator = this.$el.querySelector('.active-bg-indicator');
+          if (indicator) {
+            indicator.style.top = `${top}px`;
+          }
+        }
+      });
     },
     handleMouseEnter(menuId) {
       this.hoverMenu = menuId;
@@ -191,21 +213,23 @@ export default {
   display: none;
 }
 
-/* 调整活动指示器样式 */
+/* 修复活动指示器样式问题 */
 .active-bg-indicator {
   position: absolute;
-  width: 48px; /* 略小于按钮以显示边缘发光效果 */
+  width: 48px;
   height: 48px;
-  border-radius: 22px; /* 大圆角 */
-  background: rgba(255, 255, 255, 0.9); /* 更轻柔的背景色 */
-  transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.4s ease; /* 更平滑的过渡 */
-  opacity: 0;
+  border-radius: 22px;
+  /* 使用明确的渐变颜色值 */
+  background: linear-gradient(135deg, rgba(254, 75, 197, 0.15) 0%, rgba(152, 47, 246, 0.15) 100%);
+  transition: top 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+  opacity: 1;
   left: 50%;
-  top: 20px;
   transform: translateX(-50%);
   z-index: -1;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1); /* 轻微阴影 */
-  border: 1px solid rgba(255, 255, 255, 0.8); /* 添加边框 */
+  /* 设置VisionOS风格的阴影效果 */
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  /* 修改边框样式，类似于通知框 */
+  border: 1px solid rgba(254, 75, 197, 0.3);
 }
 
 /* 菜单按钮样式 */
@@ -220,22 +244,21 @@ export default {
   cursor: pointer;
   transition: all 0.3s ease;
   z-index: 2;
-  background: rgba(255, 255, 255, 0.0); /* 透明背景 */
-  border: 1px solid rgba(255, 255, 255, 0.0); /* 透明边框 */
+  /* 移除默认背景和边框 */
+  background: transparent;
+  border: none;
 }
 
 .menu-button:hover {
-  background-color: rgba(255, 255, 255, 0.8);
-  transform: scale(1.05);
-  border: 1px solid rgba(255, 255, 255, 0.9); /* 悬停时显示边框 */
-  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05); /* 悬停时添加阴影 */
+  background: transparent;
+  border: none;
+  box-shadow: none;
+  transform: none; /* 移除整体缩放 */
 }
 
-.menu-button.active {
-  color: #0077FF; /* 苹果标准蓝色 */
-  background-color: transparent;
-  box-shadow: none;
-  transform: scale(1.05);
+.menu-button:hover .menu-icon {
+  transform: scale(1.15); /* 仅放大图标 */
+  color: rgba(254, 75, 197, 0.8); /* 悬停时颜色轻微变化 */
 }
 
 .menu-icon {
@@ -243,11 +266,27 @@ export default {
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: color 0.3s ease;
+  transition: all 0.3s ease;
+  /* 添加transform-origin以确保放大效果居中 */
+  transform-origin: center;
+}
+
+/* 修复菜单按钮活动态样式 */
+.menu-button.active {
+  /* 使用渐变颜色 */
+  color: rgb(254, 75, 197);
+  /* 移除背景和阴影，保持透明 */
+  background: transparent;
+  box-shadow: none;
+  border: none;
+  transform: none;
 }
 
 .menu-button.active .menu-icon {
-  color: #0077FF; /* 确保图标颜色也改变 */
+  /* 使用渐变效果，通过text-shadow实现发光效果 */
+  color: rgb(254, 75, 197);
+  text-shadow: 0 0 15px rgba(254, 75, 197, 0.5);
+  transform: scale(1.1);
 }
 
 /* 工具提示样式 */
