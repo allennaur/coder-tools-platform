@@ -1,14 +1,18 @@
 <template>
   <HelloWorld msg="Welcome to Your Vue.js App"/>
+  <!-- 添加全局Toast组件 -->
+  <Toast />
 </template>
 
 <script>
 import HelloWorld from './components/HelloWorld.vue'
+import Toast from './components/common/Toast.vue'
 
 export default {
   name: 'App',
   components: {
-    HelloWorld
+    HelloWorld,
+    Toast
   }
 }
 </script>

@@ -130,17 +130,13 @@
       </div>
     </div>
     
-    <!-- 复制成功提示 -->
-    <div class="toast-container" :class="{ 'toast-show': showToast }">
-      <div class="toast-message">
-        <i class="fas fa-check-circle toast-icon"></i>
-        <span>{{ toastMessage }}</span>
-      </div>
-    </div>
+    <!-- 移除局部 Toast 组件 -->
   </div>
 </template>
 
 <script>
+import ToastService from '@/utils/ToastService';
+
 export default {
   name: 'JsonTool',
   data() {
@@ -162,8 +158,6 @@ export default {
       initialWidth: 0,
       containerWidth: 0,
       collapsedLines: new Set(), // 记录被折叠的行
-      showToast: false,
-      toastMessage: '',
       collapsibleRanges: [], // 存储可折叠范围 [开始行, 结束行]
       lineTypes: [], // 存储每行的类型 (object-start, array-start, object-end, array-end, key-value)
       hoveredLine: null, // 当前鼠标悬浮的行
@@ -463,11 +457,11 @@ export default {
       
       navigator.clipboard.writeText(textToCopy)
         .then(() => {
-          this.showToastMessage('复制成功');
+          ToastService.success('复制成功'); // 使用成功类型
         })
         .catch(err => {
           console.error('复制失败:', err);
-          this.showToastMessage('复制失败，请手动复制');
+          ToastService.error('复制失败，请手动复制'); // 使用错误类型
         });
     },
     handleHover() {
@@ -627,13 +621,7 @@ export default {
     
     // 显示自定义提示消息
     showToastMessage(message) {
-      this.toastMessage = message;
-      this.showToast = true;
-      
-      // 3秒后自动隐藏
-      setTimeout(() => {
-        this.showToast = false;
-      }, 3000);
+      ToastService.success(message);
     },
     
     // 检查行是否可折叠
@@ -758,7 +746,7 @@ export default {
       // 处理JSON以显示在右侧
       this.processJson();
       // 提示用户
-      this.showToastMessage('已插入示例JSON数据');
+      ToastService.info('已插入示例JSON数据'); // 使用信息类型
     },
     // 压缩JSON
     compressJson() {
