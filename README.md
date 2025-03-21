@@ -1,5 +1,7 @@
 # Coder Tools Platform
 
+[English](./README_EN.md) | 中文
+
 一个面向开发人员的现代化工具平台，采用 Apple VisionOS 风格设计，帮助开发者提高日常工作效率。本项目由 AI 辅助开发，通过 GitHub Copilot 实现设计、代码实现和功能优化。
 
 ## 特性
