@@ -18,14 +18,17 @@
       ></textarea>
     </div>
     
-    <!-- 拖拽调整区域 -->
+    <!-- 拖拽调整区域 - 视觉反馈优化 -->
     <div 
       class="resize-handle" 
       @mousedown="startResize"
       @mouseover="handleHover"
       @mouseleave="handleLeave"
       :class="{ 'active': isResizing, 'hover': isHovering }"
-    ></div>
+    >
+      <div class="handle-grip"></div>
+      <div class="resize-feedback" v-if="isResizing"></div>
+    </div>
     
     <!-- 右侧结果显示框 -->
     <div class="json-panel json-result-panel" :style="{ width: (100 - leftPanelWidth) + '%', minWidth: minPanelWidth + 'px' }">
@@ -136,6 +139,9 @@ export default {
       isYamlMode: false, // 标记当前是否为YAML显示模式
       isCsvMode: false, // 标记当前是否为CSV显示模式
       currentFormat: 'JSON', // 当前数据格式
+      resizeRAF: null, // 用于requestAnimationFrame的ID
+      lastResizeEvent: null, // 存储最后一个resize事件
+      animationInProgress: false, // 标记是否有动画正在进行中
     }
   },
   mounted() {
@@ -424,14 +430,38 @@ export default {
       this.initialWidth = this.leftPanelWidth;
       this.containerWidth = this.$el.offsetWidth;
       
-      document.addEventListener('mousemove', this.doResize);
+      // 直接在document上添加事件监听，提高响应速度
+      document.addEventListener('mousemove', this.handleResizeEvent);
       document.addEventListener('mouseup', this.stopResize);
+      
+      // 添加body样式，防止文本选择和改变光标
+      document.body.style.userSelect = 'none';
+      document.body.style.cursor = 'col-resize';
+      
+      // 添加类以禁用过渡动画
+      this.$el.classList.add('resizing');
       
       event.preventDefault();
     },
-    doResize(event) {
-      if (!this.isResizing) return;
+    
+    // 新增方法：处理resize事件并使用RAF优化
+    handleResizeEvent(event) {
+      // 保存最后一次事件
+      this.lastResizeEvent = event;
       
+      // 如果已经有动画帧在排队，不再创建新的
+      if (!this.resizeRAF) {
+        this.resizeRAF = requestAnimationFrame(this.processResize);
+      }
+    },
+    
+    // 新增方法：在动画帧中处理resize
+    processResize() {
+      this.resizeRAF = null;
+      
+      if (!this.isResizing || !this.lastResizeEvent) return;
+      
+      const event = this.lastResizeEvent;
       const deltaX = event.clientX - this.initialX;
       const deltaPercentage = (deltaX / this.containerWidth) * 100;
       
@@ -442,25 +472,105 @@ export default {
       const leftMinPercent = (this.leftMinPanelWidth / this.containerWidth) * 100;
       const rightMinPercent = (this.rightMinPanelWidth / this.containerWidth) * 100;
       
-      // 检查左侧是否达到最小宽度
+      // 应用自然限制但添加一些弹性
       if (newLeftPanelWidth < leftMinPercent) {
-        newLeftPanelWidth = leftMinPercent;
-      }
-      
-      // 检查右侧是否达到最小宽度
-      if ((100 - newLeftPanelWidth) < rightMinPercent) {
-        newLeftPanelWidth = 100 - rightMinPercent;
+        const overshoot = leftMinPercent - newLeftPanelWidth;
+        // 使用非线性阻尼效果
+        newLeftPanelWidth = leftMinPercent - (overshoot * Math.exp(-overshoot * 0.1));
+      } else if ((100 - newLeftPanelWidth) < rightMinPercent) {
+        const overshoot = rightMinPercent - (100 - newLeftPanelWidth);
+        // 使用非线性阻尼效果
+        newLeftPanelWidth = (100 - rightMinPercent) + (overshoot * Math.exp(-overshoot * 0.1));
       }
       
       // 更新面板宽度
       this.leftPanelWidth = newLeftPanelWidth;
+      
+      // 检查是否仍在拖动中，如果是则继续请求下一帧
+      if (this.isResizing && !this.resizeRAF) {
+        this.resizeRAF = requestAnimationFrame(this.processResize);
+      }
     },
+    
     stopResize() {
+      if (!this.isResizing) return;
+      
+      // 取消任何待处理的动画帧
+      if (this.resizeRAF) {
+        cancelAnimationFrame(this.resizeRAF);
+        this.resizeRAF = null;
+      }
+      
       this.isResizing = false;
       this.isHovering = false;
-      document.removeEventListener('mousemove', this.doResize);
+      document.removeEventListener('mousemove', this.handleResizeEvent);
       document.removeEventListener('mouseup', this.stopResize);
+      
+      // 移除body样式
+      document.body.style.userSelect = '';
+      document.body.style.cursor = '';
+      
+      // 移除禁用过渡动画的类
+      this.$el.classList.remove('resizing');
+      
+      // 恢复到有效的最小宽度，但使用平滑动画
+      const leftMinPercent = (this.leftMinPanelWidth / this.containerWidth) * 100;
+      const rightMinPercent = (this.rightMinPanelWidth / this.containerWidth) * 100;
+      
+      if (this.leftPanelWidth < leftMinPercent || (100 - this.leftPanelWidth) < rightMinPercent) {
+        this.animateToValidWidth();
+      }
     },
+    
+    // 新增方法：平滑动画到有效宽度
+    animateToValidWidth() {
+      if (this.animationInProgress) return;
+      
+      const leftMinPercent = (this.leftMinPanelWidth / this.containerWidth) * 100;
+      const rightMinPercent = (this.rightMinPanelWidth / this.containerWidth) * 100;
+      
+      let targetWidth;
+      
+      // 确定目标宽度
+      if (this.leftPanelWidth < leftMinPercent) {
+        targetWidth = leftMinPercent;
+      } else if ((100 - this.leftPanelWidth) < rightMinPercent) {
+        targetWidth = 100 - rightMinPercent;
+      } else {
+        return; // 已经在有效范围内
+      }
+      
+      // 设置动画状态
+      this.animationInProgress = true;
+      
+      // 创建动画函数
+      const startWidth = this.leftPanelWidth;
+      const totalDelta = targetWidth - startWidth;
+      const startTime = performance.now();
+      const duration = 250; // 动画持续250毫秒
+      
+      const animate = (currentTime) => {
+        const elapsed = currentTime - startTime;
+        
+        if (elapsed >= duration) {
+          // 动画结束，直接设置为目标值
+          this.leftPanelWidth = targetWidth;
+          this.animationInProgress = false;
+          return;
+        }
+        
+        // 使用easeOutExpo缓动函数计算当前值
+        const progress = 1 - Math.pow(2, -10 * elapsed / duration);
+        this.leftPanelWidth = startWidth + totalDelta * progress;
+        
+        // 继续动画
+        requestAnimationFrame(animate);
+      };
+      
+      // 开始动画
+      requestAnimationFrame(animate);
+    },
+    
     // 显示自定义提示消息
     showToastMessage(message) {
       this.toastMessage = message;
@@ -1142,60 +1252,72 @@ export default {
     },
     // 新增方法：测量两侧面板头部宽度
     measurePanelsWidth() {
-      this.$nextTick(() => {
-        // 测量左侧面板头部宽度
-        const leftHeader = this.$el.querySelector('.json-input-panel .panel-header');
-        if (leftHeader) {
-          const leftTitle = leftHeader.querySelector('h3');
-          const leftActions = leftHeader.querySelector('.panel-actions');
-          
-          if (leftTitle && leftActions) {
-            const leftTitleWidth = leftTitle.getBoundingClientRect().width;
-            const leftActionsWidth = leftActions.getBoundingClientRect().width;
+      // 使用防抖技术，避免频繁测量
+      if (this._measureDebounceTimeout) {
+        clearTimeout(this._measureDebounceTimeout);
+      }
+      
+      this._measureDebounceTimeout = setTimeout(() => {
+        this.$nextTick(() => {
+          // 测量左侧面板头部宽度
+          const leftHeader = this.$el.querySelector('.json-input-panel .panel-header');
+          if (leftHeader) {
+            const leftTitle = leftHeader.querySelector('h3');
+            const leftActions = leftHeader.querySelector('.panel-actions');
             
-            // 计算内边距
-            const leftStyle = window.getComputedStyle(leftHeader);
-            const leftPaddingLeft = parseInt(leftStyle.paddingLeft) || 0;
-            const leftPaddingRight = parseInt(leftStyle.paddingRight) || 0;
-            
-            // 计算左侧所需最小宽度（添加缓冲区）
-            const leftMinWidth = leftTitleWidth + leftActionsWidth + leftPaddingLeft + leftPaddingRight + 40;
-            
-            // 更新左侧最小宽度（不小于基础最小宽度）
-            this.leftMinPanelWidth = Math.max(this.minPanelWidth, leftMinWidth);
-            
-            console.log('左侧面板最小宽度:', this.leftMinPanelWidth, 'px');
+            if (leftTitle && leftActions) {
+              const leftTitleWidth = leftTitle.getBoundingClientRect().width;
+              const leftActionsWidth = leftActions.getBoundingClientRect().width;
+              
+              // 计算内边距
+              const leftStyle = window.getComputedStyle(leftHeader);
+              const leftPaddingLeft = parseInt(leftStyle.paddingLeft) || 0;
+              const leftPaddingRight = parseInt(leftStyle.paddingRight) || 0;
+              
+              // 计算左侧所需最小宽度（添加缓冲区）
+              const leftMinWidth = leftTitleWidth + leftActionsWidth + leftPaddingLeft + leftPaddingRight + 40;
+              
+              // 更新左侧最小宽度（不小于基础最小宽度）
+              this.leftMinPanelWidth = Math.max(this.minPanelWidth, leftMinWidth);
+              
+              console.log('左侧面板最小宽度:', this.leftMinPanelWidth, 'px');
+            }
           }
-        }
-        
-        // 测量右侧面板头部宽度
-        const rightHeader = this.$el.querySelector('.json-result-panel .panel-header');
-        if (rightHeader) {
-          const rightTitle = rightHeader.querySelector('h3');
-          const rightActions = rightHeader.querySelector('.panel-actions');
           
-          if (rightTitle && rightActions) {
-            const rightTitleWidth = rightTitle.getBoundingClientRect().width;
-            const rightActionsWidth = rightActions.getBoundingClientRect().width;
+          // 测量右侧面板头部宽度
+          const rightHeader = this.$el.querySelector('.json-result-panel .panel-header');
+          if (rightHeader) {
+            const rightTitle = rightHeader.querySelector('h3');
+            const rightActions = rightHeader.querySelector('.panel-actions');
             
-            // 计算内边距
-            const rightStyle = window.getComputedStyle(rightHeader);
-            const rightPaddingLeft = parseInt(rightStyle.paddingLeft) || 0;
-            const rightPaddingRight = parseInt(rightStyle.paddingRight) || 0;
-            
-            // 计算右侧所需最小宽度（添加缓冲区）
-            const rightMinWidth = rightTitleWidth + rightActionsWidth + rightPaddingLeft + rightPaddingRight + 40;
-            
-            // 更新右侧最小宽度（不小于基础最小宽度）
-            this.rightMinPanelWidth = Math.max(this.minPanelWidth, rightMinWidth);
-            
-            console.log('右侧面板最小宽度:', this.rightMinPanelWidth, 'px');
+            if (rightTitle && rightActions) {
+              const rightTitleWidth = rightTitle.getBoundingClientRect().width;
+              const rightActionsWidth = rightActions.getBoundingClientRect().width;
+              
+              // 计算内边距
+              const rightStyle = window.getComputedStyle(rightHeader);
+              const rightPaddingLeft = parseInt(rightStyle.paddingLeft) || 0;
+              const rightPaddingRight = parseInt(rightStyle.paddingRight) || 0;
+              
+              // 计算右侧所需最小宽度（添加缓冲区）
+              const rightMinWidth = rightTitleWidth + rightActionsWidth + rightPaddingLeft + rightPaddingRight + 40;
+              
+              // 更新右侧最小宽度（不小于基础最小宽度）
+              this.rightMinPanelWidth = Math.max(this.minPanelWidth, rightMinWidth);
+              
+              console.log('右侧面板最小宽度:', this.rightMinPanelWidth, 'px');
+            }
           }
-        }
-        
-        // 测量完成后调整面板宽度
-        this.adjustPanelsWidth();
-      });
+          
+          // 测量完成后调整面板宽度
+          this.adjustPanelsWidth();
+          
+          // 调整面板宽度后，检查是否需要平滑过渡
+          if (!this.isResizing) {
+            this.animateToValidWidth();
+          }
+        });
+      }, 100); // 100毫秒延迟
     },
   }
 }
@@ -1212,13 +1334,16 @@ export default {
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
   box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+  transform: translateZ(0);
+  -webkit-font-smoothing: subpixel-antialiased;
 }
 
 .json-panel {
   height: 100%;
   display: flex;
   flex-direction: column;
-  transition: width 0.1s ease;
+  transition: width 0.25s cubic-bezier(0.215, 0.61, 0.355, 1); /* 更自然的过渡效果 */
+  will-change: width; /* 优化性能 */
   min-width: 200px;
 }
 
@@ -1292,52 +1417,58 @@ export default {
   word-break: break-word;
 }
 
+/* 优化拖拽手柄样式 */
 .resize-handle {
-  width: 8px; /* 增加宽度，更容易点击 */
+  width: 12px; /* 增加宽度以便更容易点击 */
   height: 100%;
-  background-color: rgba(0, 0, 0, 0.02);
-  cursor: col-resize; /* 始终显示调整列宽光标 */
-  transition: background-color 0.2s ease;
+  background-color: transparent;
+  cursor: col-resize;
   z-index: 10;
-  margin: 0 -4px; /* 负外边距使点击区域更大 */
+  margin: 0 -6px;  /* 相应调整负边距 */
   position: relative;
   display: flex;
   justify-content: center;
   align-items: center;
+  touch-action: none; /* 优化触摸设备上的响应 */
 }
 
-.resize-handle:hover,
-.resize-handle.hover {
-  background-color: rgba(151, 47, 246, 0.1);
-}
-
-.resize-handle.active {
-  background-color: rgba(151, 47, 246, 0.2);
-}
-
-.resize-handle::after {
-  content: "";
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  height: 60px; /* 墛大高度 */
+.handle-grip {
   width: 2px;
-  background-color: rgba(151, 47, 246, 0.5);
-  border-radius: 1px;
-  transition: height 0.2s ease, background-color 0.2s ease;
+  height: 40px;
+  background: rgba(151, 47, 246, 0.3);
+  border-radius: 3px;
+  transition: height 0.15s ease, background-color 0.15s ease, transform 0.15s ease;
+  will-change: height, background-color, transform; /* 优化动画性能 */
 }
 
-.resize-handle:hover::after,
-.resize-handle.hover::after {
-  height: 80px; /* 悬停时增大高度 */
-  background-color: rgba(151, 47, 246, 0.7);
+.resize-handle:hover .handle-grip,
+.resize-handle.hover .handle-grip {
+  height: 60px;
+  background: rgba(151, 47, 246, 0.5);
 }
 
-.resize-handle.active::after {
-  height: 120px; /* 拖拽时进一步增大高度 */
-  background-color: rgba(151, 47, 246, 0.9);
-  box-shadow: 0 0 8px rgba(151, 47, 246, 0.5);
+.resize-handle.active .handle-grip {
+  height: 100px;
+  background: rgba(151, 47, 246, 0.7);
+  box-shadow: 0 0 12px rgba(151, 47, 246, 0.4);
+}
+
+/* 拖动时的视觉反馈元素 */
+.resize-feedback {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 1px;
+  background-color: rgba(151, 47, 246, 1);
+  box-shadow: 0 0 8px rgba(151, 47, 246, 0.8);
+  animation: pulse 1.5s infinite;
+  z-index: 1000;
+}
+
+@keyframes pulse {
+  0% { opacity: 0.6; }
+  50% { opacity: 1; }
+  100% { opacity: 0.6; }
 }
 
 .json-input-panel,
@@ -1350,6 +1481,8 @@ export default {
   flex: 1;
   overflow-y: auto;
   padding: 15px;
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch; /* 优化iOS滚动 */
 }
 
 .json-viewer {
@@ -1357,6 +1490,7 @@ export default {
   font-size: 14px;
   line-height: 1.5;
   text-align: left;
+  padding-left: 8px;
 }
 
 .json-line {
@@ -1463,7 +1597,7 @@ export default {
 
 .toggle-btn:hover {
   background-color: rgba(11, 117, 184, 0.2);
-  transform: scale(1.1);
+  transform: translateY(-1px);
 }
 
 .toggle-placeholder {
