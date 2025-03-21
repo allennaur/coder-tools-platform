@@ -122,9 +122,14 @@ export default {
       const menuIndex = this.menus.findIndex(menu => menu.id === this.activeMenu);
       if (menuIndex === -1) return {};
       
-      // 使用绝对定位，确保与按钮完全对齐
+      // 微调位置确保完美对齐，调整按钮大小
+      const buttonHeight = 44; // 按钮高度从48px减小到44px
+      const gap = 16; // 保持相同的间距
+      const topPadding = 16; // 保持相同的顶部内边距
+      const offsetY = topPadding + menuIndex * (buttonHeight + gap);
+      
       return {
-        top: `${menuIndex * 68 + 20}px`, // 20px是顶部内边距，68px是每个按钮的总高度(含间距)
+        top: `${offsetY}px`,
         opacity: 1
       };
     }
@@ -180,26 +185,26 @@ export default {
   overflow: hidden; /* 确保内容不会溢出 */
 }
 
-/* 侧边栏样式 - 调整为VisionOS风格 */
+/* 侧边栏样式 - 调整为更窄的宽度 */
 .sidebar {
   position: fixed;
-  left: 20px; /* 调整位置 */
+  left: 20px;
   top: 50%;
   transform: translateY(-50%);
-  width: 60px;
-  padding: 20px 8px; /* 增加内边距 */
-  background: rgba(255, 255, 255, 0.6); /* 更透明的背景 */
-  border-radius: 28px; /* 增大圆角 */
+  width: 56px; /* 减小宽度，从64px改为56px */
+  padding: 16px 6px; /* 减小内边距，从16px 8px改为16px 6px */
+  background: rgba(255, 255, 255, 0.4);
+  border-radius: 28px; /* 稍微减小圆角，从32px改为28px */
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 20px; /* 增加按钮间距 */
-  backdrop-filter: blur(30px); /* 增强模糊效果 */
-  -webkit-backdrop-filter: blur(30px);
-  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08); /* 更柔和的阴影 */
+  gap: 16px;
+  backdrop-filter: blur(25px);
+  -webkit-backdrop-filter: blur(25px);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.06);
   transition: all 0.3s ease;
   z-index: 100;
-  border: 1px solid rgba(255, 255, 255, 0.7);
+  border: 1px solid rgba(255, 255, 255, 0.6);
   height: auto;
   min-height: fit-content;
   max-height: 80vh;
@@ -213,36 +218,36 @@ export default {
   display: none;
 }
 
-/* 修复活动指示器样式问题 */
+/* 修改活动指示器样式 - 调整大小适应更窄的工具栏 */
 .active-bg-indicator {
   position: absolute;
-  width: 48px;
-  height: 48px;
-  border-radius: 22px;
-  /* 使用明确的渐变颜色值 */
-  background: linear-gradient(135deg, rgba(254, 75, 197, 0.15) 0%, rgba(152, 47, 246, 0.15) 100%);
-  transition: top 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+  width: 44px; /* 从48px减小到44px */
+  height: 44px; /* 从48px减小到44px */
+  border-radius: 50%; /* 圆形指示器 */
+  /* 使用纯色渐变，不含透明度 */
+  background: linear-gradient(135deg, rgb(254, 75, 197) 0%, rgb(152, 47, 246) 100%);
+  transition: top 0.5s cubic-bezier(0.2, 0.8, 0.2, 1);
   opacity: 1;
   left: 50%;
   transform: translateX(-50%);
   z-index: -1;
-  /* 设置VisionOS风格的阴影效果 */
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
-  /* 修改边框样式，类似于通知框 */
-  border: 1px solid rgba(254, 75, 197, 0.3);
+  /* 更精致的阴影效果 */
+  box-shadow: 0 5px 15px rgba(254, 75, 197, 0.3), 0 0 30px rgba(152, 47, 246, 0.2);
+  /* 添加内部光晕效果 */
+  border: 1px solid rgba(255, 255, 255, 0.5);
 }
 
-/* 菜单按钮样式 */
+/* 菜单按钮样式 - 调整大小 */
 .menu-button {
   position: relative;
   display: flex;
   justify-content: center;
   align-items: center;
-  width: 48px;
-  height: 48px;
-  border-radius: 22px; /* 圆角匹配指示器 */
+  width: 44px; /* 从48px减小到44px */
+  height: 44px; /* 从48px减小到44px */
+  border-radius: 50%; /* 使用圆形按钮，与指示器匹配 */
   cursor: pointer;
-  transition: all 0.3s ease;
+  transition: all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1); /* 更平滑的过渡 */
   z-index: 2;
   /* 移除默认背景和边框 */
   background: transparent;
@@ -258,35 +263,36 @@ export default {
 
 .menu-button:hover .menu-icon {
   transform: scale(1.15); /* 仅放大图标 */
-  color: rgba(254, 75, 197, 0.8); /* 悬停时颜色轻微变化 */
+  /* 使用更柔和的颜色过渡 */
+  color: rgba(115, 103, 240, 0.9);
 }
 
 .menu-icon {
-  font-size: 20px;
+  font-size: 18px; /* 从20px减小到18px，使图标略微小一些 */
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: all 0.3s ease;
+  transition: all 0.35s cubic-bezier(0.2, 0.8, 0.2, 1); /* 更平滑的过渡效果 */
   /* 添加transform-origin以确保放大效果居中 */
   transform-origin: center;
 }
 
-/* 修复菜单按钮活动态样式 */
+/* 修改菜单按钮活动态样式 - 确保图标颜色与背景色协调 */
 .menu-button.active {
-  /* 使用渐变颜色 */
-  color: rgb(254, 75, 197);
-  /* 移除背景和阴影，保持透明 */
+  /* 保持图标文本颜色为白色，以便在纯色背景上易于辨认 */
+  color: white;
   background: transparent;
   box-shadow: none;
   border: none;
   transform: none;
+  z-index: 3; /* 确保图标在指示器上方 */
 }
 
 .menu-button.active .menu-icon {
-  /* 使用渐变效果，通过text-shadow实现发光效果 */
-  color: rgb(254, 75, 197);
-  text-shadow: 0 0 15px rgba(254, 75, 197, 0.5);
-  transform: scale(1.1);
+  /* 设置为白色，添加轻微发光效果增强可见性 */
+  color: white;
+  text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+  transform: scale(1.15);
 }
 
 /* 工具提示样式 */
@@ -336,10 +342,11 @@ export default {
   position: relative;
 }
 
+/* 调整内容区域的左侧内边距，以适应更窄的侧边栏 */
 .content-wrapper {
   height: 100%;
   width: 100%;
-  padding: 0 40px 0 90px; /* 左侧增加空间以适应固定菜单栏 */
+  padding: 0 40px 0 86px; /* 左侧内边距从90px减小到86px */
   box-sizing: border-box;
   display: flex;
   justify-content: center;
