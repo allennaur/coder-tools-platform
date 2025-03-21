@@ -69,56 +69,125 @@ export default {
   bottom: 20px;
 }
 
+/* VisionOS 样式的 Toast 消息 - 调整了尺寸比例 */
 .toast-message {
-  background: rgba(0, 0, 0, 0.7);
-  color: white;
-  padding: 10px 16px;
-  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.6);
+  color: #333;
+  padding: 12px 20px;
+  border-radius: 16px; /* 调整为更圆润的边角 */
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 10px;
   font-size: 14px;
+  font-weight: 500;
   margin: 8px 0;
-  max-width: 80%;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  backdrop-filter: blur(5px);
-  -webkit-backdrop-filter: blur(5px);
+  max-width: 400px; /* 设置最大宽度，保持合适的阅读宽度 */
+  width: auto; /* 宽度由内容决定，但不超过最大宽度 */
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.08);
+  backdrop-filter: blur(30px);
+  -webkit-backdrop-filter: blur(30px);
+  border: 1px solid rgba(255, 255, 255, 0.7);
   pointer-events: auto;
+  transform-origin: center;
 }
 
-.toast-success {
-  background: rgba(38, 166, 91, 0.9);
+/* 不同类型的 Toast 样式 - 移除了左侧色块，使用调色点 */
+.toast-success .toast-icon {
+  color: #34c759;
 }
 
-.toast-error {
-  background: rgba(235, 59, 90, 0.9);
+.toast-error .toast-icon {
+  color: #ff3b30;
 }
 
-.toast-warning {
-  background: rgba(255, 159, 67, 0.9);
+.toast-warning .toast-icon {
+  color: #ff9500;
 }
 
-.toast-info {
-  background: rgba(0, 122, 255, 0.9);
+.toast-info .toast-icon {
+  color: #007aff;
 }
 
 .toast-icon {
-  font-size: 16px;
+  font-size: 18px;
+  min-width: 24px; /* 使用min-width确保图标有一致的空间 */
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 2px; /* 为图标添加一点右侧边距 */
 }
 
-/* 动画效果 */
-.toast-enter-active,
+/* VisionOS 风格的动画效果 */
+.toast-enter-active {
+  animation: toast-in 0.4s cubic-bezier(0.18, 0.89, 0.32, 1.28);
+}
+
 .toast-leave-active {
-  transition: all 0.3s ease;
+  animation: toast-out 0.3s cubic-bezier(0.6, -0.28, 0.74, 0.05);
 }
 
-.toast-enter-from {
-  opacity: 0;
-  transform: translateY(-20px);
+@keyframes toast-in {
+  0% {
+    opacity: 0;
+    transform: translateY(-20px) scale(0.9);
+    filter: blur(8px);
+  }
+  50% {
+    opacity: 1;
+    transform: translateY(5px) scale(1.02);
+    filter: blur(0);
+  }
+  100% {
+    transform: translateY(0) scale(1);
+  }
 }
 
-.toast-leave-to {
-  opacity: 0;
-  transform: translateY(-20px);
+@keyframes toast-out {
+  0% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-20px) scale(0.9);
+    filter: blur(4px);
+  }
+}
+
+/* 媒体查询：适配移动设备 */
+@media (max-width: 768px) {
+  .toast-message {
+    max-width: 90%;
+    width: auto;
+    min-width: 200px; /* 确保移动端有最小宽度 */
+    font-size: 13px;
+    padding: 10px 16px;
+  }
+}
+
+/* 添加深色模式支持 */
+@media (prefers-color-scheme: dark) {
+  .toast-message {
+    background: rgba(50, 50, 50, 0.75);
+    color: #f5f5f7;
+    border: 1px solid rgba(100, 100, 100, 0.3);
+  }
+  
+  .toast-success {
+    background: rgba(25, 55, 25, 0.85);
+  }
+  
+  .toast-error {
+    background: rgba(55, 25, 25, 0.85);
+  }
+  
+  .toast-warning {
+    background: rgba(55, 45, 25, 0.85);
+  }
+  
+  .toast-info {
+    background: rgba(25, 25, 55, 0.85);
+  }
 }
 </style>

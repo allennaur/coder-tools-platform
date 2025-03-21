@@ -7,16 +7,23 @@ const state = reactive({
   nextId: 0, // 用于生成唯一ID
 });
 
-// 默认配置
+// 默认配置 - 调整为更适合 VisionOS 风格的配置
 const defaultOptions = {
-  duration: 3000, // 消息显示时长
+  duration: 4000, // VisionOS 风格倾向于稍长的显示时间
   type: 'info', // 消息类型：info, success, warning, error
   position: 'top', // 位置：top, bottom
+  preventDuplicates: true, // 防止重复消息
 };
 
 export default {
   // 向队列添加消息
   show(message, options = {}) {
+    // 如果启用防止重复且消息已存在，则不添加新消息
+    if (options.preventDuplicates !== false && 
+        state.visibleToasts.some(t => t.message === message && t.type === (options.type || defaultOptions.type))) {
+      return -1;
+    }
+    
     const id = state.nextId++;
     const toast = {
       id,
