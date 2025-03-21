@@ -153,38 +153,37 @@ export default {
   width: 100vw;
   font-family: -apple-system, BlinkMacSystemFont, 'SF Pro', 'Helvetica Neue', sans-serif;
   color: #333;
-  background: linear-gradient(135deg, rgba(255,255,255,0.95) 0%, rgba(240,240,250,0.9) 100%);
+  background: linear-gradient(135deg, rgba(240,240,250,0.8) 0%, rgba(230,230,250,0.7) 100%); /* 调整背景，更符合VisionOS的柔和风格 */
   position: relative;
+  overflow: hidden; /* 确保内容不会溢出 */
 }
 
-/* 侧边栏样式 */
+/* 侧边栏样式 - 调整为VisionOS风格 */
 .sidebar {
   position: fixed;
-  left: 15px;
+  left: 20px; /* 调整位置 */
   top: 50%;
   transform: translateY(-50%);
-  width: 55px;
-  padding: 15px 5px;
-  background: rgba(255, 255, 255, 0.5);
-  border-radius: 25px;
+  width: 60px;
+  padding: 20px 8px; /* 增加内边距 */
+  background: rgba(255, 255, 255, 0.6); /* 更透明的背景 */
+  border-radius: 28px; /* 增大圆角 */
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 15px;
-  backdrop-filter: blur(30px);
+  gap: 20px; /* 增加按钮间距 */
+  backdrop-filter: blur(30px); /* 增强模糊效果 */
   -webkit-backdrop-filter: blur(30px);
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08); /* 更柔和的阴影 */
   transition: all 0.3s ease;
   z-index: 100;
   border: 1px solid rgba(255, 255, 255, 0.7);
-  /* 确保容器大小完全由内容决定 */
   height: auto;
   min-height: fit-content;
-  max-height: 80vh; /* 限制最大高度为视窗高度的80% */
-  overflow-y: auto; /* 内容过多时显示滚动条 */
-  /* 隐藏滚动条但保持功能 */
-  scrollbar-width: none; /* Firefox */
-  -ms-overflow-style: none; /* IE/Edge */
+  max-height: 80vh;
+  overflow-y: auto;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
 }
 
 /* 隐藏Webkit浏览器的滚动条 */
@@ -192,45 +191,51 @@ export default {
   display: none;
 }
 
+/* 调整活动指示器样式 */
 .active-bg-indicator {
   position: absolute;
-  width: 45px;
-  height: 45px;
-  border-radius: 18px;
-  background: linear-gradient(135deg, rgba(255,76,197,0.9) 0%, rgba(151,47,246,0.9) 100%);
-  transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.3s ease;
+  width: 48px; /* 略小于按钮以显示边缘发光效果 */
+  height: 48px;
+  border-radius: 22px; /* 大圆角 */
+  background: rgba(255, 255, 255, 0.9); /* 更轻柔的背景色 */
+  transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.4s ease; /* 更平滑的过渡 */
   opacity: 0;
-  /* 修改定位方式，确保水平居中 */
   left: 50%;
-  top: 15px; /* 顶部padding */
+  top: 20px;
   transform: translateX(-50%);
   z-index: -1;
-  box-shadow: 0 4px 15px rgba(255,76,197,0.3);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1); /* 轻微阴影 */
+  border: 1px solid rgba(255, 255, 255, 0.8); /* 添加边框 */
 }
 
+/* 菜单按钮样式 */
 .menu-button {
   position: relative;
   display: flex;
   justify-content: center;
   align-items: center;
-  width: 45px;
-  height: 45px;
-  border-radius: 18px;
+  width: 48px;
+  height: 48px;
+  border-radius: 22px; /* 圆角匹配指示器 */
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: all 0.3s ease;
   z-index: 2;
+  background: rgba(255, 255, 255, 0.0); /* 透明背景 */
+  border: 1px solid rgba(255, 255, 255, 0.0); /* 透明边框 */
 }
 
 .menu-button:hover {
-  background-color: rgba(255, 255, 255, 0.7);
-  transform: scale(1.08);
+  background-color: rgba(255, 255, 255, 0.8);
+  transform: scale(1.05);
+  border: 1px solid rgba(255, 255, 255, 0.9); /* 悬停时显示边框 */
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05); /* 悬停时添加阴影 */
 }
 
 .menu-button.active {
-  color: white;
+  color: #0077FF; /* 苹果标准蓝色 */
   background-color: transparent;
   box-shadow: none;
-  transform: scale(1.08);
+  transform: scale(1.05);
 }
 
 .menu-icon {
@@ -238,30 +243,35 @@ export default {
   display: flex;
   align-items: center;
   justify-content: center;
+  transition: color 0.3s ease;
 }
 
-/* 彻底重写工具提示样式 */
+.menu-button.active .menu-icon {
+  color: #0077FF; /* 确保图标颜色也改变 */
+}
+
+/* 工具提示样式 */
 .tooltip {
   position: absolute;
-  left: 60px;
-  background: rgba(255, 255, 255, 0.95);
-  padding: 5px 10px;
-  border-radius: 10px;
-  font-size: 12px;
+  left: 70px;
+  background: rgba(255, 255, 255, 0.8);
+  padding: 8px 12px;
+  border-radius: 12px;
+  font-size: 13px;
   white-space: nowrap;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
   opacity: 0;
   visibility: hidden;
   transform: translateX(-10px);
   transition: all 0.3s ease;
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.8);
   font-weight: 500;
   color: #333;
   z-index: 1000;
   pointer-events: none;
-  display: block; /* 确保元素显示为块级元素 */
+  display: block;
 }
 
 .menu-button:hover .tooltip {
@@ -312,10 +322,10 @@ export default {
 }
 
 .home-page h1 {
-  font-size: 36px;
+  font-size: 38px; /* 增大标题 */
   font-weight: 600;
-  margin-bottom: 10px;
-  background: linear-gradient(135deg, #007AFF 0%, #5856D6 100%);
+  margin-bottom: 12px;
+  background: linear-gradient(135deg, #0077FF 0%, #5856D6 100%); /* 更符合苹果色系 */
   -webkit-background-clip: text;
   background-clip: text;
   -webkit-text-fill-color: transparent;
@@ -323,9 +333,11 @@ export default {
 }
 
 .subtitle {
-  color: #777;
-  margin-bottom: 40px;
+  color: #666;
+  margin-bottom: 50px; /* 增加间距 */
   text-align: center;
+  font-size: 18px; /* 增大字号 */
+  font-weight: 400; /* 调整字重 */
 }
 
 /* 卡片样式 */
@@ -336,50 +348,53 @@ export default {
 }
 
 .tool-card {
-  background: rgba(255, 255, 255, 0.7);
+  background: rgba(255, 255, 255, 0.6);
   border-radius: 24px;
-  padding: 20px;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
-  transition: all 0.3s ease;
+  padding: 25px; /* 增加内间距 */
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.06);
+  transition: all 0.4s ease;
   cursor: pointer;
   overflow: hidden;
   display: flex;
   align-items: center;
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.5);
+  backdrop-filter: blur(30px);
+  -webkit-backdrop-filter: blur(30px);
+  border: 1px solid rgba(255, 255, 255, 0.7);
+  tabindex: "0";
 }
 
 .tool-card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
-  background: rgba(255, 255, 255, 0.9);
+  transform: translateY(-8px) scale(1.02);
+  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.12);
+  background: rgba(255, 255, 255, 0.8);
 }
 
 /* 优化卡片图标样式 */
 .card-icon {
   font-size: 24px;
-  width: 56px;
-  height: 56px; /* 增加高度，确保为正方形 */
-  min-width: 56px; /* 确保最小宽度 */
+  width: 60px;
+  height: 60px;
+  min-width: 60px;
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-right: 15px;
-  border-radius: 18px; /* 增加圆角使其更加柔和 */
+  margin-right: 20px;
+  border-radius: 20px;
   background: rgba(0, 122, 255, 0.1);
-  color: #007AFF;
+  color: #0077FF;
   transition: all 0.3s ease;
+  border: 1px solid rgba(0, 122, 255, 0.2); /* 添加边框 */
 }
 
 .tool-card:hover .card-icon {
-  background: rgba(0, 122, 255, 0.2); /* 悬停时背景色更深 */
-  transform: scale(1.05); /* 轻微放大效果 */
+  background: rgba(0, 122, 255, 0.15);
+  transform: scale(1.08);
+  box-shadow: 0 5px 15px rgba(0, 122, 255, 0.15);
 }
 
 .card-content h3 {
-  font-size: 18px;
-  margin: 0 0 8px 0;
+  font-size: 20px; /* 增大标题 */
+  margin: 0 0 10px 0;
   font-weight: 600;
 }
 
@@ -387,7 +402,7 @@ export default {
   margin: 0;
   font-size: 14px;
   color: #666;
-  line-height: 1.5;
+  line-height: 1.6;
 }
 
 /* 功能页面样式 */
@@ -424,10 +439,10 @@ export default {
 }
 
 .feature-page h2 {
-  font-size: 28px;
-  margin-bottom: 10px;
+  font-size: 30px; /* 增大标题 */
+  margin-bottom: 12px;
   color: #333;
-  background: linear-gradient(135deg, rgba(255,76,197,1) 0%, rgba(151,47,246,1) 100%);
+  background: linear-gradient(135deg, #0077FF 0%, #5856D6 100%);
   -webkit-background-clip: text;
   background-clip: text;
   -webkit-text-fill-color: transparent;
@@ -458,5 +473,23 @@ export default {
 .fade-transform-leave-to {
   opacity: 0;
   transform: translateY(-20px);
+}
+
+/* 修复菜单按钮焦点样式 */
+.menu-button:focus {
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(0, 122, 255, 0.15);
+  background-color: rgba(255, 255, 255, 0.6);
+}
+
+.menu-button.active:focus {
+  box-shadow: 0 0 0 2px rgba(0, 122, 255, 0.3);
+}
+
+/* 工具卡片焦点样式 */
+.tool-card:focus {
+  outline: none;
+  box-shadow: 0 10px 30px rgba(0, 122, 255, 0.15);
+  border-color: rgba(0, 122, 255, 0.3);
 }
 </style>
