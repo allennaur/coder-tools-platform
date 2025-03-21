@@ -29,6 +29,8 @@
               box-shadow 0.4s ease; 
   will-change: width;
   min-width: 200px;
+  /* 增加溢出控制 */
+  overflow: hidden;
 }
 
 .panel-header {
@@ -186,7 +188,7 @@
 
 .json-textarea {
   flex: 1;
-  width: 100%;
+  width: calc(100% - 20px); /* 修改：考虑左右margin各10px */
   padding: 16px;
   border: none;
   resize: none;
@@ -201,6 +203,7 @@
   margin: 10px; /* 添加边距使文本区域不贴边 */
   backdrop-filter: blur(5px); /* 文本区域的模糊效果 */
   -webkit-backdrop-filter: blur(5px);
+  box-sizing: border-box; /* 添加box-sizing确保尺寸计算正确 */
 }
 
 /* 优化拖拽手柄样式，符合VisionOS风格 */
@@ -758,7 +761,7 @@
   cursor: not-allowed;
   transform: none !important;
   background: rgba(0, 0, 0, 0.05) !important;
-  color: #999 !重要;
+  color: #999 !important;
   box-shadow: none !important;
 }
 

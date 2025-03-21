@@ -16,22 +16,34 @@
 
 <script>
 import ToastService from '@/utils/ToastService';
-import { computed } from 'vue';
 
 export default {
   name: 'Toast',
-  setup() {
-    // 获取当前可见的消息
-    const visibleToasts = computed(() => ToastService.getVisibleToasts());
-    
-    // 根据位置计算CSS类
-    const positionClass = computed(() => {
-      const positions = new Set(visibleToasts.value.map(toast => toast.position || 'top'));
+  data() {
+    return {
+      toasts: []
+    }
+  },
+  computed: {
+    visibleToasts() {
+      return this.toasts;
+    },
+    positionClass() {
+      const positions = new Set(this.toasts.map(toast => toast.position || 'top'));
       return Array.from(positions).map(pos => `position-${pos}`);
-    });
+    }
+  },
+  mounted() {
+    // 初始化现有的toast
+    this.toasts = ToastService.getVisibleToasts();
     
-    // 获取图标类名
-    const getIconClass = (type) => {
+    // 注册监听器接收来自ToastService的通知
+    ToastService._notify = (toasts) => {
+      this.toasts = toasts;
+    };
+  },
+  methods: {
+    getIconClass(type) {
       switch (type) {
         case 'success': return 'fas fa-check-circle';
         case 'error': return 'fas fa-times-circle';
@@ -39,14 +51,8 @@ export default {
         case 'info': return 'fas fa-info-circle';
         default: return 'fas fa-info-circle';
       }
-    };
-    
-    return {
-      visibleToasts,
-      positionClass,
-      getIconClass,
-    };
-  },
+    }
+  }
 };
 </script>
 

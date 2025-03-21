@@ -160,6 +160,7 @@ input:checked + .toggle-slider:before {
   border: 1px solid rgba(255, 255, 255, 0.7);
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
   transition: all 0.3s ease;
+  min-width: 260px;
 }
 
 .conversion-card:hover {
@@ -179,6 +180,7 @@ input:checked + .toggle-slider:before {
   display: flex;
   flex-direction: column;
   gap: 16px;
+  overflow: hidden;
 }
 
 .card-footer {
@@ -193,6 +195,7 @@ input:checked + .toggle-slider:before {
 /* 输入组和结果组 */
 .input-group {
   margin-bottom: 8px;
+  overflow: hidden;
 }
 
 .input-with-select {
@@ -201,6 +204,8 @@ input:checked + .toggle-slider:before {
   border: 1px solid rgba(0, 0, 0, 0.1);
   overflow: hidden;
   background: white;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .input-with-select input {
@@ -209,6 +214,7 @@ input:checked + .toggle-slider:before {
   padding: 10px 12px;
   outline: none;
   font-size: 14px;
+  min-width: 0;
 }
 
 .precision-select {
@@ -262,6 +268,7 @@ input:checked + .toggle-slider:before {
   background: rgba(255, 255, 255, 0.4);
   padding: 8px 12px;
   border-radius: 10px;
+  overflow: hidden;
 }
 
 .result-item label {
@@ -279,6 +286,9 @@ input:checked + .toggle-slider:before {
   font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, Courier, monospace;
   font-size: 14px;
   padding: 4px 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  min-width: 0;
 }
 
 /* 工具按钮样式 */
@@ -452,6 +462,78 @@ input:checked + .toggle-slider:before {
 .form-input input[readonly] {
   background: rgba(255, 255, 255, 0.5);
   font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, Courier, monospace;
+  border: none;  /* 添加：移除边框 */
+  outline: none; /* 添加：移除轮廓 */
+  padding: 4px 0; /* 添加：统一内边距 */
+  flex: 1;       /* 添加：允许伸展 */
+  min-width: 0;  /* 添加：允许收缩 */
+  overflow: hidden; /* 添加：控制溢出 */
+  text-overflow: ellipsis; /* 添加：文本溢出处理 */
+  /* 禁用点击时的选中效果 */
+  user-select: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  /* 点击时不显示轮廓 */
+  outline: none !important;
+  /* 增加颜色对比度，提高可读性 */
+  color: #333;
+}
+
+/* 为"计算结果"输入框添加更强的样式规则，彻底禁用所有可能的边框和轮廓 */
+.form-input input[readonly],
+.form-input input[readonly]:focus,
+.form-input input[readonly]:active,
+.form-input input[readonly]:hover {
+  background: rgba(255, 255, 255, 0.5);
+  font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, Courier, monospace;
+  border: none !important;  
+  outline: none !important; 
+  box-shadow: none !important;
+  padding: 4px 0; 
+  flex: 1;       
+  min-width: 0;  
+  overflow: hidden; 
+  text-overflow: ellipsis; 
+  user-select: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  color: #333;
+  -webkit-appearance: none; /* 移除默认的WebKit样式 */
+  -moz-appearance: none; /* 移除Firefox默认样式 */
+  appearance: none; /* 标准语法 */
+}
+
+/* 确保结果行中的输入框具有合理的宽度 */
+.result-row .form-input input[readonly] {
+  width: auto;
+  max-width: 380px; /* 给复制按钮预留空间 */
+}
+
+/* 为"计算结果"行添加特殊样式，使其样式与其他结果项一致 */
+.result-row .form-input {
+  background: rgba(255, 255, 255, 0.4); /* 添加：与其他结果项背景一致 */
+  border-radius: 10px; /* 添加：圆角一致 */
+  padding: 8px 12px;  /* 添加：内边距一致 */
+  overflow: hidden;    /* 添加：控制溢出 */
+  /* 限制结果显示区域的最大宽度 */
+  max-width: 500px;
+  width: auto;
+  /* 确保内容居左显示 */
+  text-align: left;
+}
+
+/* 确保结果行中的输入框具有合理的宽度 */
+.result-row .form-input input[readonly] {
+  width: auto;
+  max-width: 380px; /* 给复制按钮预留空间 */
+}
+
+/* 调整结果行的布局，使复制按钮和输入框更好地配合 */
+.result-row .form-input .tool-button {
+  flex-shrink: 0; /* 防止按钮被压缩 */
+  margin-left: auto; /* 将按钮推到右侧 */
 }
 
 /* 全屏按钮样式 */

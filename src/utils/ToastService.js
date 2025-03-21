@@ -102,7 +102,10 @@ const ToastService = {
       isToastCreated = true;
     }
     
-    // 这里可以添加其他通知机制，如事件发射等
+    // 添加通知机制：调用一个特殊的回调函数来更新组件
+    if (this._notify && typeof this._notify === 'function') {
+      this._notify([...toastQueue]); // 传递队列副本
+    }
   }
 };
 
