@@ -88,30 +88,30 @@ export default {
     return {
       activeMenu: 'home',
       hoverMenu: null,
-      activeMenuIndex: 0, // 添加一个索引跟踪，便于精确定位
+      activeMenuIndex: 0, 
       menus: [
         {
           id: 'home',
           label: '主页',
-          icon: 'fas fa-home',
+          icon: 'fas fa-home', // 保持原有图标
           description: '平台主页'
         },
         {
           id: 'json',
+          icon: 'fas fa-code-branch', // 更新为可用的JSON相关图标
           label: 'JSON',
-          icon: 'fas fa-code',
           description: 'JSON格式化、验证、压缩和转换工具，帮助开发者更高效地处理JSON数据'
         },
         {
           id: 'timestamp',
           label: '时间戳',
-          icon: 'fas fa-clock',
+          icon: 'fas fa-clock', // 保持原有图标
           description: '时间戳与日期格式互转，支持多种时间格式和时区转换'
         },
         {
           id: 'java',
           label: 'Java 工具',
-          icon: 'fab fa-java',
+          icon: 'fas fa-code', // 保持更通用的代码图标
           description: 'Java相关工具，包括代码格式化、类结构分析等功能'
         }
       ]
@@ -275,6 +275,15 @@ export default {
   transition: all 0.35s cubic-bezier(0.2, 0.8, 0.2, 1); /* 更平滑的过渡效果 */
   /* 添加transform-origin以确保放大效果居中 */
   transform-origin: center;
+  height: 22px; /* 确保所有图标高度一致 */
+  width: 22px; /* 确保所有图标宽度一致 */
+}
+
+.menu-icon i {
+  line-height: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 /* 修改菜单按钮活动态样式 - 确保图标颜色与背景色协调 */
