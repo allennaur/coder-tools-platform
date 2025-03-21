@@ -7,7 +7,6 @@
         <div class="panel-actions">
           <button @click="insertExample" class="tool-button">示例</button>
           <button @click="clearInput" class="tool-button">清空</button>
-          <button @click="formatInput" class="tool-button">格式化</button>
         </div>
       </div>
       <textarea 
@@ -332,26 +331,16 @@ export default {
       this.jsonInput = fixedInput;
       this.processJson();
     },
-    formatInput() {
-      try {
-        if (!this.jsonInput.trim()) return;
-        
-        const parsedJson = JSON.parse(this.jsonInput);
-        this.jsonInput = JSON.stringify(parsedJson, null, 2);
-        this.processJson();
-      } catch (error) {
-        this.jsonError = true;
-        this.jsonErrorMessage = error.message;
-        this.tryRepairJson();
-      }
-    },
     clearInput() {
       this.jsonInput = '';
       this.formattedJson = [];
+      this.visibleJsonLines = []; // 清空显示的行数据
       this.jsonResult = '';
       this.jsonError = false;
       this.jsonErrorMessage = '';
       this.hasRepairSuggestion = false;
+      this.completeJsonString = ''; // 确保完整的JSON字符串也被清空
+      this.collapsedLines = new Set(); // 重置折叠状态
     },
     copyToClipboard() {
       // 使用完整的JSON字符串进行复制
@@ -419,6 +408,11 @@ export default {
     
     // 检查行是否可折叠
     isCollapsible(line) {
+      // 检查参数是否为字符串
+      if (typeof line !== 'string') {
+        return false;
+      }
+      
       return (line.includes('": {') || line.includes('": [')) && 
              (line.trim().endsWith('{') || line.trim().endsWith('['));
     },
@@ -441,22 +435,18 @@ export default {
     
     // 处理可见行
     processVisibleLines() {
-      // 创建一个新的行数组，排除根级别的括号（即首尾行）
+      // 创建一个新的行数组，包含所有行（包括根级别的括号）
       let processed = [...this.formattedJson];
       
       // 处理需要隐藏的行（被折叠的内容）
       const newVisibleLines = [];
       let skipUntilIndent = -1;
       let currentCollapsedCount = 0;
-      // 移除未使用的变量
       
       for (let i = 0; i < processed.length; i++) {
         const line = processed[i];
         
-        // 跳过最外层的大括号（首尾行）
-        if (line.type === 'root-start' || line.type === 'root-end') {
-          continue;
-        }
+        // 不再跳过最外层的大括号，现在显示所有行
         
         // 如果当前在跳过折叠内容模式
         if (skipUntilIndent >= 0) {
@@ -482,7 +472,6 @@ export default {
           // 检查这一行是否被折叠了
           if (this.isCollapsible(line.content) && this.collapsedLines.has(i)) {
             skipUntilIndent = line.indent;
-            // 不再使用 lastCollapsedStartIndex
             currentCollapsedCount = 0;
           }
           
@@ -515,8 +504,18 @@ export default {
       return match ? match[0].length / 2 : 0;
     },
     handleLineHover(index) {
-      if (this.isCollapsible(this.formattedJson[index])) {
-        this.hoveredLine = index;
+      // 确保索引有效且在格式化的JSON范围内
+      if (index === undefined || index < 0 || index >= this.formattedJson.length) {
+        return;
+      }
+      
+      const line = this.formattedJson[index];
+      
+      // 确保行对象有效且包含content属性
+      if (line && line.content && typeof line.content === 'string') {
+        if (this.isCollapsible(line.content)) {
+          this.hoveredLine = index;
+        }
       }
     },
     
