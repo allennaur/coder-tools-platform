@@ -1,178 +1,74 @@
 # Coder Tools Platform
 
-一个基于 Vue.js 构建的开发者工具平台，提供多种常用的开发工具。
+一个面向开发人员的现代化工具平台，采用 Apple VisionOS 风格设计，帮助开发者提高日常工作效率。本项目由 AI 辅助开发，通过 GitHub Copilot 实现设计、代码实现和功能优化。
 
-## 功能特性
+## 特性
 
-平台目前提供以下工具：
+- 🧰 **多功能工具集**：JSON处理工具、时间戳转换工具、Java工具等
+- 💻 **全AI驱动开发**：所有功能逻辑、UI设计及代码实现均由 AI 辅助完成
+- 🎨 **现代化界面**：Apple VisionOS 风格的 UI 设计，支持亮色/深色模式
+- 💾 **状态持久化**：自动保存工具状态，下次打开时恢复
+- 📱 **响应式设计**：适配不同设备尺寸，提供良好的移动端体验
+- 🔄 **实时反馈**：操作过程中提供即时视觉反馈和通知提示
 
-- **JSON 工具**：JSON 格式化、验证、压缩和转换功能
-- **时间戳转换**：在不同时间格式之间快速转换，支持多种时区
-- **Java 工具**：Java 相关的开发辅助工具，包括代码格式化、类结构分析等
+## 工具集
 
-## 界面预览
+### JSON 工具
 
-- 响应式布局，适配不同屏幕尺寸
-- 左侧悬浮工具栏，鼠标悬停时显示功能名称
-- 毛玻璃效果和渐变色设计
+- JSON 格式化和压缩
+- JSON 语法验证和错误提示
+- JSON 转换为 XML、YAML、CSV
+- 智能修复 JSON 错误
+- 交互式 JSON 浏览器
 
-## 安装与运行
+### 时间戳转换工具
 
-### 环境要求
+- 时间戳与日期时间互转
+- 多种时间格式转换
+- 时间计算功能（增加、减少、时间差）
+- 相对时间显示
+- 时区转换
 
-- Node.js 12.x 或更高版本
-- npm 6.x 或更高版本
+### Java 工具
 
-### 本地开发
+- 字符串操作工具（集合运算）
+- 代码结构对比
+- 字符串处理和批量转换
 
-1. 克隆项目到本地
+## AI 辅助开发
+
+本项目是AI辅助开发的示例，所有组件从设计到实现均由 GitHub Copilot 提供帮助：
+
+- UI/UX 设计：VisionOS 风格界面设计由 AI 生成
+- 功能逻辑：工具的核心算法和业务逻辑由 AI 实现
+- 代码实现：Vue.js 组件结构和样式实现
+- 问题调试：问题修复和代码优化
+- 交互体验：动画效果和用户反馈机制
+
+## 技术栈
+
+- Vue 3
+- CSS3 (自定义样式，无UI框架)
+- FontAwesome 图标
+- LocalStorage 持久化存储
+
+## 开始使用
 
 ```bash
-git clone https://github.com/yourusername/coder-tools-platform.git
-cd coder-tools-platform
-```
-
-2. 安装依赖
-
-```bash
+# 安装依赖
 npm install
-```
 
-3. 安装 Font Awesome 图标库
-
-```bash
-npm install @fortawesome/fontawesome-free
-```
-
-4. 在 main.js 中导入 Font Awesome
-
-```javascript
-import '@fortawesome/fontawesome-free/css/all.min.css'
-```
-
-5. 启动开发服务器
-
-```bash
+# 启动开发服务器
 npm run serve
-```
 
-访问 `http://localhost:8080` 查看应用。
-
-### 构建生产版本
-
-```bash
+# 构建生产版本
 npm run build
 ```
-
-构建完成后，生成的文件将位于 `dist` 目录。
-
-### 代码检查
-
-```bash
-npm run lint
-```
-
-## Nginx 部署教程
-
-### 1. 构建生产版本
-
-```bash
-npm run build
-```
-
-### 2. 安装 Nginx
-
-根据您的操作系统安装 Nginx：
-
-#### Ubuntu/Debian
-
-```bash
-sudo apt update
-sudo apt install nginx
-```
-
-#### CentOS/RHEL
-
-```bash
-sudo yum install epel-release
-sudo yum install nginx
-```
-
-#### macOS
-
-```bash
-brew install nginx
-```
-
-### 3. 配置 Nginx
-
-创建或编辑 Nginx 配置文件：
-
-```bash
-sudo nano /etc/nginx/conf.d/coder-tools.conf
-```
-
-添加以下配置：
-
-```nginx
-server {
-    listen 80;
-    server_name your-domain.com;  # 替换为您的域名或 IP
-
-    root /path/to/coder-tools-platform/dist;  # 替换为项目 dist 目录的实际路径
-    index index.html;
-
-    location / {
-        try_files $uri $uri/ /index.html;  # 用于支持 vue-router 的 history 模式
-    }
-
-    # 缓存静态资源
-    location ~* \.(js|css|png|jpg|jpeg|gif|ico|svg)$ {
-        expires 1y;
-        add_header Cache-Control "public, max-age=31536000";
-    }
-
-    # 安全相关头信息
-    add_header X-Content-Type-Options "nosniff";
-    add_header X-XSS-Protection "1; mode=block";
-}
-```
-
-### 4. 检查配置并启动 Nginx
-
-```bash
-# 检查配置是否有语法错误
-sudo nginx -t
-
-# 如果配置无误，重启 Nginx 应用新配置
-sudo systemctl restart nginx  # 对于 systemd 系统
-# 或
-sudo service nginx restart    # 对于 init.d 系统
-# 或
-sudo nginx -s reload          # 直接使用 nginx 命令
-```
-
-### 5. 设置防火墙（如果需要）
-
-如果您的服务器启用了防火墙，请确保开放 HTTP/HTTPS 端口：
-
-```bash
-# 对于 ufw（Ubuntu/Debian）
-sudo ufw allow 'Nginx HTTP'
-sudo ufw allow 'Nginx HTTPS'
-
-# 对于 firewalld（CentOS/RHEL）
-sudo firewall-cmd --permanent --add-service=http
-sudo firewall-cmd --permanent --add-service=https
-sudo firewall-cmd --reload
-```
-
-现在您应该可以通过您的域名或服务器 IP 访问应用了。
-
-## 自定义配置
-
-有关更多自定义配置选项，请参阅 [Vue CLI 配置参考](https://cli.vuejs.org/config/)。
 
 ## 许可证
 
-[MIT](LICENSE)
+MIT
+
+---
+
+**Coder Tools Platform** - 由 AI 驱动的开发者工具集 🚀

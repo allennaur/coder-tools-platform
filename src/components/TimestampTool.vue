@@ -10,6 +10,11 @@
           </button>
         </div>
         <div class="panel-actions">
+          <!-- 添加复制当前时间戳按钮 -->
+          <button @click="copyCurrentTimestamp" class="tool-button">
+            <i class="fas fa-copy"></i>
+            复制当前时间戳
+          </button>
           <button @click="getCurrentTime" class="tool-button primary-button">
             <i class="fas fa-sync-alt"></i>
             获取当前时间
@@ -52,7 +57,7 @@
                 placeholder="输入秒/毫秒时间戳" 
               />
               <div class="precision-select">
-                <select v-model="timestampUnit" @change="handleTimestampInput">
+                <select v-model="timestampUnit" @change="handleTimestampInput" class="visionos-select">
                   <option value="seconds">秒</option>
                   <option value="milliseconds">毫秒</option>
                 </select>
@@ -81,11 +86,20 @@
           </div>
         </div>
         <div class="card-footer">
-          <button @click="copyConversionResult('timestamp')" class="tool-button">
+          <button 
+            @click="copyConversionResult('timestamp')" 
+            class="tool-button"
+            :disabled="!hasTimestampResult"
+            :class="{'disabled': !hasTimestampResult}"
+          >
             <i class="fas fa-copy"></i>
             复制结果
           </button>
-          <button v-if="isCopyable('timestamp')" @click="clearTimestampInput" class="tool-button">
+          <button 
+            v-if="isCopyable('timestamp')" 
+            @click="clearTimestampInput" 
+            class="tool-button"
+          >
             清空输入
           </button>
         </div>
@@ -103,6 +117,7 @@
                 type="datetime-local"
                 v-model="dateTimeInput" 
                 @input="handleDateTimeInput"
+                class="visionos-datetime"
               />
             </div>
           </div>
@@ -128,11 +143,20 @@
           </div>
         </div>
         <div class="card-footer">
-          <button @click="copyConversionResult('datetime')" class="tool-button">
+          <button 
+            @click="copyConversionResult('datetime')" 
+            class="tool-button"
+            :disabled="!hasDateTimeResult"
+            :class="{'disabled': !hasDateTimeResult}"
+          >
             <i class="fas fa-copy"></i>
             复制结果
           </button>
-          <button v-if="isCopyable('datetime')" @click="clearDateTimeInput" class="tool-button">
+          <button 
+            v-if="isCopyable('datetime')" 
+            @click="clearDateTimeInput" 
+            class="tool-button"
+          >
             清空输入
           </button>
         </div>
@@ -149,7 +173,12 @@
           <div class="format-item" v-for="(format, index) in timeFormats" :key="index">
             <div class="format-name">{{ format.name }}</div>
             <div class="format-value">{{ format.example }}</div>
-            <button @click="copyText(format.example)" class="tool-button mini-button">
+            <button 
+              @click="copyText(format.example)" 
+              class="tool-button mini-button"
+              :disabled="!format.example"
+              :class="{'disabled': !format.example}"
+            >
               <i class="fas fa-copy"></i>
             </button>
           </div>
@@ -172,6 +201,7 @@
                   type="datetime-local" 
                   v-model="baseTimeInput"
                   @input="calculateTimeOperation"
+                  class="visionos-datetime"
                 />
                 <button @click="useCurrentTimeAsBase" class="tool-button mini-button">
                   使用当前时间
@@ -181,7 +211,11 @@
             <div class="form-row">
               <div class="form-label">操作:</div>
               <div class="form-input">
-                <select v-model="timeOperation" @change="calculateTimeOperation">
+                <select 
+                  v-model="timeOperation" 
+                  @change="calculateTimeOperation"
+                  class="visionos-select"
+                >
                   <option value="add">增加时间</option>
                   <option value="subtract">减少时间</option>
                   <option value="difference">计算时间差</option>
@@ -196,8 +230,13 @@
                   v-model="timeValue"
                   @input="calculateTimeOperation"
                   min="0"
+                  class="visionos-number"
                 />
-                <select v-model="timeUnit" @change="calculateTimeOperation">
+                <select 
+                  v-model="timeUnit" 
+                  @change="calculateTimeOperation"
+                  class="visionos-select"
+                >
                   <option value="minutes">分钟</option>
                   <option value="hours">小时</option>
                   <option value="days">天</option>
@@ -214,6 +253,7 @@
                   type="datetime-local" 
                   v-model="endTimeInput"
                   @input="calculateTimeOperation"
+                  class="visionos-datetime"
                 />
                 <button @click="useCurrentTimeAsEnd" class="tool-button mini-button">
                   使用当前时间
@@ -224,7 +264,12 @@
               <div class="form-label">计算结果:</div>
               <div class="form-input">
                 <input type="text" v-model="timeOperationResult" readonly />
-                <button @click="copyText(timeOperationResult)" class="tool-button">
+                <button 
+                  @click="copyText(timeOperationResult)" 
+                  class="tool-button"
+                  :disabled="!timeOperationResult"
+                  :class="{'disabled': !timeOperationResult}"
+                >
                   <i class="fas fa-copy"></i>
                   复制
                 </button>

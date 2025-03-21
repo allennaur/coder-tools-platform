@@ -138,4 +138,45 @@ input, textarea, select {
   -webkit-overflow-scrolling: touch;
   max-width: 100%;
 }
+
+/* 全局日期选择器和下拉菜单美化 - VisionOS风格 */
+input[type="datetime-local"],
+select {
+  border-radius: 12px;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  padding: 8px 12px;
+  font-size: 14px;
+  background-color: rgba(255, 255, 255, 0.7);
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.03);
+}
+
+input[type="datetime-local"]:focus,
+select:focus {
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(0, 122, 255, 0.2);
+  border-color: rgba(0, 122, 255, 0.4);
+}
+
+/* 美化日历图标 */
+::-webkit-calendar-picker-indicator {
+  filter: opacity(0.6);
+  transition: filter 0.2s ease;
+}
+
+::-webkit-calendar-picker-indicator:hover {
+  filter: opacity(1);
+  cursor: pointer;
+}
+
+/* 美化下拉箭头 */
+select {
+  appearance: none;
+  -webkit-appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23666' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 10px center;
+  background-size: 16px;
+  padding-right: 30px;
+}
 </style>
