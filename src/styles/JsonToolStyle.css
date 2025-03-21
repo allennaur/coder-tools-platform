@@ -818,8 +818,8 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 24px;
-  height: 24px;
+  width: 28px;
+  height: 28px; 
   border-radius: 50%;
   background: rgba(0, 0, 0, 0.05);
   color: #666;
@@ -851,6 +851,18 @@
   z-index: 9999 !important;
   border-radius: 0 !important;
   background-color: rgba(245, 245, 250, 0.98) !important;
+  /* 添加内边距，确保内容与浏览器边缘保持距离 */
+  padding: 20px !important;
+  box-sizing: border-box !important;
+}
+
+.fullscreen-mode .json-panel {
+  /* 确保JSON面板在全屏模式下也有圆角 */
+  border-radius: 16px !important;
+  /* 添加内容容器的背景半透明效果 */
+  background-color: rgba(255, 255, 255, 0.6) !important;
+  /* 为面板添加微妙的阴影 */
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.05) !important;
 }
 
 .fullscreen-mode .resize-handle {
@@ -864,28 +876,5 @@
 
 /* 退出全屏按钮 */
 .exit-fullscreen-btn {
-  position: fixed;
-  top: 20px;
-  right: 20px;
-  z-index: 10000;
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  background: rgba(0, 0, 0, 0.1);
-  border: none;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  color: #333;
-}
-
-.exit-fullscreen-btn:hover {
-  background: rgba(0, 0, 0, 0.2);
-  transform: scale(1.1);
-}
-
-.exit-fullscreen-btn i {
-  font-size: 18px;
+  display: none !important;
 }

@@ -5,9 +5,9 @@
       <div class="panel-header">
         <div style="display: flex; align-items: center;">
           <h3>JSON 输入</h3>
-          <!-- 添加全屏按钮 -->
-          <button class="fullscreen-btn" @click="toggleFullScreen" title="全屏模式">
-            <i class="fas fa-expand"></i>
+          <!-- 更新全屏按钮图标，动态根据全屏状态变化 -->
+          <button class="fullscreen-btn" @click="toggleFullScreen" :title="isFullScreen ? '退出全屏' : '全屏模式'">
+            <i :class="isFullScreen ? 'fas fa-compress' : 'fas fa-expand'"></i>
           </button>
         </div>
         <div class="panel-actions">
@@ -135,11 +135,6 @@
         </div>
       </div>
     </div>
-    
-    <!-- 退出全屏按钮 -->
-    <button v-if="isFullScreen" class="exit-fullscreen-btn" @click="exitFullScreen" title="退出全屏">
-      <i class="fas fa-compress"></i>
-    </button>
   </div>
 </template>
 
