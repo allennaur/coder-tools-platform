@@ -17,20 +17,12 @@ module.exports = {
     port: 8080,
     // 关闭热更新 (解决sockjs连接问题)
     hot: false,
-    // 禁用热模块更换的WebSocket客户端
-    client: {
-      webSocketURL: false,
-    },
-    // 启用静默模式 (减少WebSocket依赖)
-    liveReload: false,
-    // 失败回退，让开发服务器在无法使用WebSocket时回退到轮询模式
-    watchOptions: {
-      poll: false,
-    },
-    // 允许所有来源访问
-    allowedHosts: 'all',
-    // 额外的配置来减少不必要的日志输出
-    webSocketServer: false,
+    // 禁用主机检查
+    disableHostCheck: true,
+    // WebSocket主机
+    sockHost: '0.0.0.0',
+    // WebSocket端口
+    sockPort: 8080
   },
   // 如果您使用了PWA插件，这里可以设置更多配置
   pwa: {},

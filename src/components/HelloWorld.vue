@@ -63,9 +63,11 @@
         <!-- Java工具内容 -->
         <div v-else-if="activeMenu === 'java'" class="content-wrapper" key="java">
           <div class="feature-page">
-            <h2>Java 工具</h2>
-            <p>Java相关的开发辅助工具</p>
-            <!-- Java工具具体实现 -->
+            <div class="feature-header">
+              <h2>Java 工具</h2>
+              <p>专业的Java开发辅助工具集合</p>
+            </div>
+            <JavaTool />
           </div>
         </div>
       </transition>
@@ -75,12 +77,14 @@
 
 <script>
 import JsonTool from './JsonTool.vue';
+import JavaTool from './JavaTool.vue';
 import StorageService from '@/utils/StorageService';
 
 export default {
   name: 'HelloWorld',
   components: {
-    JsonTool
+    JsonTool,
+    JavaTool
   },
   props: {
     msg: String
