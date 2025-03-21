@@ -1,9 +1,15 @@
 <template>
-  <div class="json-tool-container">
+  <div class="json-tool-container" :class="{'fullscreen-mode': isFullScreen}">
     <!-- 左侧输入框 -->
     <div class="json-panel json-input-panel" :style="{ width: leftPanelWidth + '%', minWidth: minPanelWidth + 'px' }">
       <div class="panel-header">
-        <h3>JSON 输入</h3>
+        <div style="display: flex; align-items: center;">
+          <h3>JSON 输入</h3>
+          <!-- 添加全屏按钮 -->
+          <button class="fullscreen-btn" @click="toggleFullScreen" title="全屏模式">
+            <i class="fas fa-expand"></i>
+          </button>
+        </div>
         <div class="panel-actions">
           <button @click="insertExample" class="tool-button">示例</button>
           <button 
@@ -129,6 +135,11 @@
         </div>
       </div>
     </div>
+    
+    <!-- 退出全屏按钮 -->
+    <button v-if="isFullScreen" class="exit-fullscreen-btn" @click="exitFullScreen" title="退出全屏">
+      <i class="fas fa-compress"></i>
+    </button>
   </div>
 </template>
 

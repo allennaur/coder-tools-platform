@@ -749,7 +749,7 @@
   cursor: not-allowed;
   transform: none !important;
   background: rgba(0, 0, 0, 0.05) !important;
-  color: #999 !important;
+  color: #999 !重要;
   box-shadow: none !important;
 }
 
@@ -811,4 +811,81 @@
 .toggle-btn:focus {
   outline: none;
   box-shadow: 0 0 0 2px rgba(0, 122, 255, 0.2);
+}
+
+/* 全屏按钮样式 */
+.fullscreen-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.05);
+  color: #666;
+  cursor: pointer;
+  margin-left: 10px;
+  border: none;
+  transition: all 0.2s ease;
+}
+
+.fullscreen-btn:hover {
+  background: rgba(0, 0, 0, 0.1);
+  color: #333;
+  transform: scale(1.1);
+}
+
+.fullscreen-btn i {
+  font-size: 14px;
+}
+
+/* 全屏模式样式 */
+.fullscreen-mode {
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  bottom: 0 !important;
+  width: 100vw !important;
+  height: 100vh !important;
+  z-index: 9999 !important;
+  border-radius: 0 !important;
+  background-color: rgba(245, 245, 250, 0.98) !important;
+}
+
+.fullscreen-mode .resize-handle {
+  display: none !important;
+}
+
+/* 在全屏模式下调整左右面板宽度 */
+.fullscreen-mode .json-panel {
+  transition: width 0.3s cubic-bezier(0.215, 0.61, 0.355, 1) !important;
+}
+
+/* 退出全屏按钮 */
+.exit-fullscreen-btn {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 10000;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.1);
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  color: #333;
+}
+
+.exit-fullscreen-btn:hover {
+  background: rgba(0, 0, 0, 0.2);
+  transform: scale(1.1);
+}
+
+.exit-fullscreen-btn i {
+  font-size: 18px;
 }

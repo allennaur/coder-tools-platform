@@ -33,6 +33,8 @@ export default {
       resizeRAF: null, // 用于requestAnimationFrame的ID
       lastResizeEvent: null, // 存储最后一个resize事件
       animationInProgress: false, // 标记是否有动画正在进行中
+      isFullScreen: false, // 添加全屏状态标志
+      previousPanelState: null, // 用于存储全屏前的面板状态
     }
   },
   computed: {
@@ -58,12 +60,21 @@ export default {
       window.addEventListener('resize', this.measurePanelsWidth);
     });
     window.addEventListener('resize', this.handleResize);
+    
+    // 添加ESC键退出全屏
+    document.addEventListener('keydown', this.handleEscKey);
   },
   beforeUnmount() {
+    if (this.isFullScreen) {
+      document.body.style.overflow = '';
+    }
     window.removeEventListener('resize', this.handleResize);
     window.removeEventListener('resize', this.measurePanelsWidth);
     document.removeEventListener('mousemove', this.doResize);
     document.removeEventListener('mouseup', this.stopResize);
+    
+    // 添加ESC键监听器清理
+    document.removeEventListener('keydown', this.handleEscKey);
   },
   methods: {
     handleResize() {
@@ -1237,6 +1248,56 @@ export default {
           }
         });
       }, 100); // 100毫秒延迟
+    },
+    // 添加全屏相关的方法
+    toggleFullScreen() {
+      if (this.isFullScreen) {
+        this.exitFullScreen();
+      } else {
+        this.enterFullScreen();
+      }
+    },
+    
+    enterFullScreen() {
+      // 保存当前状态以便退出全屏时恢复
+      this.previousPanelState = {
+        leftPanelWidth: this.leftPanelWidth
+      };
+      
+      // 开启全屏模式
+      this.isFullScreen = true;
+      
+      // 防止滚动
+      document.body.style.overflow = 'hidden';
+      
+      // 确保面板分配合理
+      this.adjustPanelsWidth();
+      
+      // 通知用户进入全屏模式
+      ToastService.info('已进入全屏模式');
+    },
+    
+    exitFullScreen() {
+      // 退出全屏
+      this.isFullScreen = false;
+      
+      // 恢复滚动
+      document.body.style.overflow = '';
+      
+      // 如果存在之前的状态，恢复
+      if (this.previousPanelState) {
+        this.leftPanelWidth = this.previousPanelState.leftPanelWidth;
+      }
+      
+      // 通知用户退出全屏模式
+      ToastService.info('已退出全屏模式');
+    },
+    
+    // ESC键处理函数
+    handleEscKey(event) {
+      if (event.key === 'Escape' && this.isFullScreen) {
+        this.exitFullScreen();
+      }
     },
   }
 };
