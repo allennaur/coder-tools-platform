@@ -33,6 +33,8 @@
         <h3>处理结果</h3>
         <div class="panel-actions">
           <button v-if="hasRepairSuggestion" @click="applyRepair" class="tool-button">修复</button>
+          <button @click="compressJson" class="tool-button compress-button">压缩</button>
+          <button @click="formatJson" class="tool-button format-button">格式化</button>
           <button @click="copyToClipboard" class="tool-button">复制</button>
         </div>
       </div>
@@ -195,9 +197,12 @@ export default {
         this.tryRepairJson();
       }
     },
-    formatJsonToHtml(json) {
-      // 将JSON格式化为字符串
-      const stringified = JSON.stringify(json, null, 2);
+    formatJsonToHtml(json, isCompressed = false) {
+      // 根据是否压缩选择不同的格式化方式
+      const stringified = isCompressed ? 
+        JSON.stringify(json) : 
+        JSON.stringify(json, null, 2);
+      
       const lines = stringified.split('\n');
       
       // 跟踪每一行的原始索引、内容和缩进级别
@@ -529,6 +534,55 @@ export default {
       this.processJson();
       // 提示用户
       this.showToastMessage('已插入示例JSON数据');
+    },
+    // 压缩JSON
+    compressJson() {
+      if (this.jsonError || !this.completeJsonString) {
+        return;
+      }
+      
+      try {
+        // 解析当前JSON
+        const parsedJson = JSON.parse(this.completeJsonString);
+        
+        // 重新转为字符串，但不添加空格和换行符
+        this.jsonResult = JSON.stringify(parsedJson);
+        this.completeJsonString = this.jsonResult;
+        
+        // 重新格式化显示
+        this.formatJsonToHtml(parsedJson, true);
+        
+        // 显示提示
+        this.showToastMessage('JSON 已压缩');
+      } catch (error) {
+        console.error('JSON压缩失败:', error);
+        this.showToastMessage('JSON 压缩失败');
+      }
+    },
+    
+    // 格式化JSON
+    formatJson() {
+      if (this.jsonError || !this.completeJsonString) {
+        return;
+      }
+      
+      try {
+        // 解析当前JSON
+        const parsedJson = JSON.parse(this.completeJsonString);
+        
+        // 重新转为格式化的字符串
+        this.jsonResult = JSON.stringify(parsedJson, null, 2);
+        this.completeJsonString = this.jsonResult;
+        
+        // 重新格式化显示
+        this.formatJsonToHtml(parsedJson);
+        
+        // 显示提示
+        this.showToastMessage('JSON 已格式化');
+      } catch (error) {
+        console.error('JSON格式化失败:', error);
+        this.showToastMessage('JSON 格式化失败');
+      }
     }
   }
 }
@@ -949,5 +1003,24 @@ export default {
   line-height: 1.5;
   text-align: left;
   padding-left: 8px;
+}
+
+/* 添加按钮差异化样式 */
+.tool-button.format-button {
+  background: linear-gradient(135deg, rgba(33, 150, 243, 0.1) 0%, rgba(3, 169, 244, 0.1) 100%);
+  color: #0277bd;
+}
+
+.tool-button.format-button:hover {
+  background: linear-gradient(135deg, rgba(33, 150, 243, 0.2) 0%, rgba(3, 169, 244, 0.2) 100%);
+}
+
+.tool-button.compress-button {
+  background: linear-gradient(135deg, rgba(255, 152, 0, 0.1) 0%, rgba(255, 193, 7, 0.1) 100%);
+  color: #e65100;
+}
+
+.tool-button.compress-button:hover {
+  background: linear-gradient(135deg, rgba(255, 152, 0, 0.2) 0%, rgba(255, 193, 7, 0.2) 100%);
 }
 </style>
