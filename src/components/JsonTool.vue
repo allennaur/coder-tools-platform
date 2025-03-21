@@ -1405,7 +1405,7 @@ export default {
   justify-content: space-between;
   align-items: center;
   padding: 14px 18px; /* 增加内间距 */
-  background: rgba(255, 255, 255, 0.7); /* 更轻微的背景色 */
+  background: rgba(255, 255, 255, 0.55); /* 降低面板头部的不透明度 */
   border-bottom: 1px solid rgba(0, 0, 0, 0.05);
   flex-shrink: 0;
   white-space: nowrap;
@@ -1424,26 +1424,71 @@ export default {
   flex-shrink: 0;
 }
 
+/* 重新设计基本按钮样式，使其与面板背景更加区分 */
 .tool-button {
   padding: 6px 12px;
-  border: none;
-  border-radius: 12px; /* 更大的圆角 */
-  background: rgba(255, 255, 255, 0.5); /* 更轻微的背景色 */
-  color: #333;
+  border-radius: 12px; /* 保持圆角 */
+  background: rgba(210, 210, 245, 0.7); /* 更深的背景色，与面板头部形成对比 */
+  color: #444;
   font-size: 12px;
-  font-weight: 500; /* 中等字重 */
+  font-weight: 500; 
   cursor: pointer;
   transition: all 0.2s ease;
   white-space: nowrap;
-  backdrop-filter: blur(10px); /* 添加模糊效果 */
-  -webkit-backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.5); /* 添加边框 */
+  backdrop-filter: blur(8px); /* 保留模糊效果 */
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid rgba(240, 240, 255, 0.7); /* 更明显的边框 */
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03); /* 添加微妙阴影增强立体感 */
 }
 
 .tool-button:hover {
-  background: rgba(255, 255, 255, 0.8);
+  background: rgba(220, 220, 250, 0.9); /* 悬停时加深背景色 */
   transform: translateY(-1px);
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 3px 12px rgba(0, 0, 0, 0.08); /* 增强悬停时的阴影效果 */
+}
+
+/* 特别优化 "示例"、"清空" 和 "复制" 按钮样式 */
+.panel-actions .tool-button:not(.format-button):not(.compress-button):not(.xml-button):not(.yaml-button):not(.csv-button) {
+  background: linear-gradient(135deg, rgba(125, 122, 232, 0.2) 0%, rgba(115, 142, 247, 0.2) 100%); /* 使用渐变背景 */
+  color: #4a4a8a; /* 更深的文字颜色 */
+  border: 1px solid rgba(125, 122, 232, 0.3); /* 协调的边框色 */
+}
+
+.panel-actions .tool-button:not(.format-button):not(.compress-button):not(.xml-button):not(.yaml-button):not(.csv-button):hover {
+  background: linear-gradient(135deg, rgba(125, 122, 232, 0.3) 0%, rgba(115, 142, 247, 0.3) 100%); /* 悬停时加深 */
+  color: #3a3a7a; /* 悬停时文字颜色略深 */
+  box-shadow: 0 3px 12px rgba(125, 122, 232, 0.15); /* 特殊阴影效果 */
+}
+
+/* 针对具体按钮添加独特样式 */
+.panel-actions button:nth-child(1) {
+  background: linear-gradient(135deg, rgba(99, 125, 255, 0.2) 0%, rgba(82, 113, 229, 0.2) 100%); /* "示例"按钮 */
+  border-color: rgba(82, 113, 229, 0.3);
+}
+
+.panel-actions button:nth-child(1):hover {
+  background: linear-gradient(135deg, rgba(99, 125, 255, 0.3) 0%, rgba(82, 113, 229, 0.3) 100%);
+}
+
+.panel-actions button:nth-child(2) {
+  background: linear-gradient(135deg, rgba(255, 111, 97, 0.15) 0%, rgba(224, 85, 95, 0.15) 100%); /* "清空"按钮 */
+  border-color: rgba(224, 85, 95, 0.25);
+  color: #af4448;
+}
+
+.panel-actions button:nth-child(2):hover {
+  background: linear-gradient(135deg, rgba(255, 111, 97, 0.25) 0%, rgba(224, 85, 95, 0.25) 100%);
+}
+
+/* 调整复制按钮样式 */
+.panel-actions button:last-child:not(.format-button):not(.compress-button):not(.xml-button):not(.yaml-button):not(.csv-button) {
+  background: linear-gradient(135deg, rgba(121, 83, 226, 0.2) 0%, rgba(103, 58, 183, 0.2) 100%); /* 复制按钮 */
+  border-color: rgba(103, 58, 183, 0.3);
+  color: #5c3a94;
+}
+
+.panel-actions button:last-child:not(.format-button):not(.compress-button):not(.xml-button):not(.yaml-button):not(.csv-button):hover {
+  background: linear-gradient(135deg, rgba(121, 83, 226, 0.3) 0%, rgba(103, 58, 183, 0.3) 100%);
 }
 
 /* 保持特有按钮样式，但调整为符合VisionOS的风格 */
@@ -2083,15 +2128,15 @@ export default {
   cursor: not-allowed;
   transform: none !important;
   background: rgba(0, 0, 0, 0.05) !important;
-  color: #999 !important;
-  box-shadow: none !important;
+  color: #999 !重要;
+  box-shadow: none !重要;
 }
 
 /* 确保禁用状态的按钮悬停时不会有交互效果 */
 .tool-button.disabled:hover {
-  background: rgba(0, 0, 0, 0.05) !important;
-  transform: none !important;
-  box-shadow: none !important;
+  background: rgba(0, 0, 0, 0.05) !重要;
+  transform: none !重要;
+  box-shadow: none !重要;
 }
 
 /* 增强文本区域的焦点状态样式 */
