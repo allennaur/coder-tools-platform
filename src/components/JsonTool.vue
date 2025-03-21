@@ -30,7 +30,12 @@
     <!-- 右侧结果显示框 -->
     <div class="json-panel json-result-panel" :style="{ width: (100 - leftPanelWidth) + '%', minWidth: minPanelWidth + 'px' }">
       <div class="panel-header">
-        <h3>处理结果</h3>
+        <h3>
+          处理结果
+          <span v-if="currentFormat !== 'JSON'" class="format-indicator">
+            ({{ currentFormat }})
+          </span>
+        </h3>
         <div class="panel-actions">
           <button v-if="hasRepairSuggestion" @click="applyRepair" class="tool-button">修复</button>
           <button @click="compressJson" class="tool-button compress-button">压缩</button>
@@ -128,6 +133,7 @@ export default {
       isXmlMode: false, // 标记当前是否为XML显示模式
       isYamlMode: false, // 标记当前是否为YAML显示模式
       isCsvMode: false, // 标记当前是否为CSV显示模式
+      currentFormat: 'JSON', // 当前数据格式
     }
   },
   mounted() {
@@ -357,6 +363,7 @@ export default {
       this.hasRepairSuggestion = false;
       this.completeJsonString = ''; // 确保完整的JSON字符串也被清空
       this.collapsedLines = new Set(); // 重置折叠状态
+      this.currentFormat = 'JSON';
     },
     copyToClipboard() {
       // 使用完整的JSON字符串进行复制
@@ -566,6 +573,9 @@ export default {
         // 重新格式化显示
         this.formatJsonToHtml(parsedJson, true);
         
+        // 设置当前格式
+        this.currentFormat = 'JSON (压缩)';
+        
         // 显示提示
         this.showToastMessage('JSON 已压缩');
       } catch (error) {
@@ -596,6 +606,9 @@ export default {
         // 重新格式化显示
         this.formatJsonToHtml(parsedJson);
         
+        // 设置当前格式
+        this.currentFormat = 'JSON';
+        
         // 显示提示
         this.showToastMessage('JSON 已格式化');
       } catch (error) {
@@ -625,6 +638,9 @@ export default {
         // 设置为XML模式，并重置其他模式
         this.resetAllFormatModes();
         this.isXmlMode = true;
+        
+        // 设置当前格式
+        this.currentFormat = 'XML';
         
         // 在视图中显示XML
         this.displayXml(xml);
@@ -739,6 +755,7 @@ export default {
       this.isXmlMode = false;
       this.isYamlMode = false;
       this.isCsvMode = false;
+      this.currentFormat = 'JSON';
     },
     // 将 JSON 转换为 YAML
     convertToYaml() {
@@ -760,6 +777,9 @@ export default {
         // 设置为YAML模式，并重置其他模式
         this.resetAllFormatModes();
         this.isYamlMode = true;
+        
+        // 设置当前格式
+        this.currentFormat = 'YAML';
         
         // 在视图中显示YAML
         this.displayFormattedText(yaml, 'yaml');
@@ -867,6 +887,9 @@ export default {
         // 设置为CSV模式，并重置其他模式
         this.resetAllFormatModes();
         this.isCsvMode = true;
+        
+        // 设置当前格式
+        this.currentFormat = 'CSV';
         
         // 在视图中显示CSV
         this.displayFormattedText(csv, 'csv');
@@ -1569,5 +1592,18 @@ export default {
 
 :deep(.csv-field) {
   color: #333;
+}
+
+/* 添加格式指示器样式 */
+.format-indicator {
+  font-size: 14px;
+  font-weight: normal;
+  color: #666;
+  margin-left: 8px;
+  background-color: rgba(0, 0, 0, 0.05);
+  padding: 2px 8px;
+  border-radius: 10px;
+  display: inline-block;
+  vertical-align: middle;
 }
 </style>
