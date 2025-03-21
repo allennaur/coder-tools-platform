@@ -36,6 +36,8 @@
           <button @click="compressJson" class="tool-button compress-button">压缩</button>
           <button @click="formatJson" class="tool-button format-button">格式化</button>
           <button @click="convertToXml" class="tool-button xml-button">转换XML</button>
+          <button @click="convertToYaml" class="tool-button yaml-button">转换YAML</button>
+          <button @click="convertToCsv" class="tool-button csv-button">转换CSV</button>
           <button @click="copyToClipboard" class="tool-button">复制</button>
         </div>
       </div>
@@ -123,7 +125,9 @@ export default {
       visibleJsonLines: [], // 当前显示的JSON行
       completeJsonString: '', // 完整的JSON字符串（用于复制）
       exampleJson: '{"basic":{"name":"Coder Tools Platform","version":"1.0.0","description":"一个功能强大的开发者工具集合","author":{"name":"开发者","email":"dev@example.com","url":"https://example.com"},"license":"MIT","repository":"https://github.com/example/coder-tools-platform"},"features":[{"id":1,"name":"JSON工具","active":true,"capabilities":["格式化","验证","压缩","转换"],"usageCount":1284,"lastUsed":"2023-07-15T08:45:30.000Z"},{"id":2,"name":"时间戳转换","active":true,"capabilities":["Unix时间戳转换","ISO格式化","时区转换"],"usageCount":856,"lastUsed":"2023-07-14T15:22:12.000Z"},{"id":3,"name":"Java工具","active":true,"capabilities":["代码格式化","类结构分析","JSON转Java类"],"usageCount":542,"lastUsed":"2023-07-13T09:18:45.000Z"}],"config":{"theme":"light","fontSize":14,"autoSave":true,"notifications":false,"shortcuts":{"formatJson":"Ctrl+Shift+F","clearEditor":"Alt+C","saveContent":"Ctrl+S"},"dimensions":{"maxWidth":"1200px","sidebarWidth":"250px","mainContentWidth":"calc(100% - 250px)"},"api":{"baseUrl":"https://api.example.com/v1","timeout":30000,"retryAttempts":3,"headers":{"Authorization":"Bearer $TOKEN","Content-Type":"application/json","Accept-Language":"zh-CN"}}},"statistics":{"totalUsers":15420,"activeUsersToday":1240,"averageSessionTime":754.8,"popularFeatures":{"JSON工具":42.5,"时间戳转换":28.3,"Java工具":18.2,"其他":11.0},"growth":{"lastMonth":12.4,"lastQuarter":34.8,"lastYear":127.5}},"specialChars":"特殊字符测试: ~!@#$%^&*()_+`-=[]{}|;\':\\",./<>?","longText":"这是一个非常长的文本字段，用于测试JSON工具对长文本的处理能力。在实际应用中，我们可能会遇到包含大段文本的JSON数据，比如文章内容、日志记录、错误信息等。这些长文本可能会导致编辑器渲染变慢，所以一个好的JSON工具应该能够高效处理这类数据。同时，这也是对工具折叠功能的测试，看它是否能够正确地折叠和展开这样的长文本节点，提高用户在处理复杂JSON数据时的体验。","nestedObject":{"level1":{"level2":{"level3":{"level4":{"level5":{"value":"这是一个深度嵌套的对象，用于测试JSON工具的格式化和展示能力"}}}}}},"largeArray":[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50],"booleans":[true,false,true,false],"nullValue":null,"numberTypes":{"integer":42,"float":3.14159,"negative":-273.15,"scientific":6.022e23,"binary":10,"octal":493,"hex":255,"infinity":1.7976931348623157e+308},"dateTime":"2023-07-15T12:30:45.123Z","emptyValues":{"string":"","array":[],"object":{},"nullValue":null},"unicodeChars":"Unicode字符测试: 你好，世界！😊🌍🚀 こんにちは世界 안녕하세요 世界 Привет, мир!","base64Data":"SGVsbG8gV29ybGQgZnJvbSBCYXNlNjQgRW5jb2RlZCBTdHJpbmc=","urlEncoded":"https%3A%2F%2Fexample.com%2Fsearch%3Fq%3Djson%20tools%26lang%3Dzh-CN"}',
-      isXmlMode: false // 标记当前是否为XML显示模式
+      isXmlMode: false, // 标记当前是否为XML显示模式
+      isYamlMode: false, // 标记当前是否为YAML显示模式
+      isCsvMode: false, // 标记当前是否为CSV显示模式
     }
   },
   mounted() {
@@ -170,8 +174,8 @@ export default {
       }
     },
     processJson() {
-      // 重置XML模式
-      this.isXmlMode = false;
+      // 重置所有格式模式
+      this.resetAllFormatModes();
       
       if (!this.jsonInput.trim()) {
         this.formattedJson = [];
@@ -342,6 +346,7 @@ export default {
       this.processJson();
     },
     clearInput() {
+      this.resetAllFormatModes();
       this.isXmlMode = false;
       this.jsonInput = '';
       this.formattedJson = [];
@@ -543,23 +548,20 @@ export default {
     },
     // 压缩JSON
     compressJson() {
-      if (this.jsonError || !this.completeJsonString) {
+      if (!this.jsonInput.trim()) {
         return;
       }
       
       try {
-        // 如果当前是XML模式，提示不支持
-        if (this.isXmlMode) {
-          this.showToastMessage('XML模式下无法压缩，请先返回JSON模式');
-          return;
-        }
+        // 解析JSON输入
+        const parsedJson = JSON.parse(this.jsonInput);
         
-        // 解析当前JSON
-        const parsedJson = JSON.parse(this.completeJsonString);
-        
-        // 重新转为字符串，但不添加空格和换行符
+        // 重新转为压缩的字符串
         this.jsonResult = JSON.stringify(parsedJson);
         this.completeJsonString = this.jsonResult;
+        
+        // 重置特殊格式模式
+        this.resetAllFormatModes();
         
         // 重新格式化显示
         this.formatJsonToHtml(parsedJson, true);
@@ -567,30 +569,29 @@ export default {
         // 显示提示
         this.showToastMessage('JSON 已压缩');
       } catch (error) {
-        console.error('JSON压缩失败:', error);
+        this.jsonError = true;
+        this.jsonErrorMessage = error.message;
+        this.tryRepairJson();
         this.showToastMessage('JSON 压缩失败');
       }
     },
     
     // 格式化JSON
     formatJson() {
-      if (this.jsonError || !this.completeJsonString) {
+      if (!this.jsonInput.trim()) {
         return;
       }
       
       try {
-        // 如果当前是XML模式，先尝试转回JSON
-        if (this.isXmlMode) {
-          this.showToastMessage('XML模式下无法格式化，请先返回JSON模式');
-          return;
-        }
-        
-        // 解析当前JSON
-        const parsedJson = JSON.parse(this.completeJsonString);
+        // 解析JSON输入
+        const parsedJson = JSON.parse(this.jsonInput);
         
         // 重新转为格式化的字符串
         this.jsonResult = JSON.stringify(parsedJson, null, 2);
         this.completeJsonString = this.jsonResult;
+        
+        // 重置特殊格式模式
+        this.resetAllFormatModes();
         
         // 重新格式化显示
         this.formatJsonToHtml(parsedJson);
@@ -598,19 +599,21 @@ export default {
         // 显示提示
         this.showToastMessage('JSON 已格式化');
       } catch (error) {
-        console.error('JSON格式化失败:', error);
+        this.jsonError = true;
+        this.jsonErrorMessage = error.message;
+        this.tryRepairJson();
         this.showToastMessage('JSON 格式化失败');
       }
     },
     // 将 JSON 转换为 XML
     convertToXml() {
-      if (this.jsonError || !this.completeJsonString) {
+      if (!this.jsonInput.trim()) {
         return;
       }
       
       try {
-        // 解析当前JSON
-        const parsedJson = JSON.parse(this.completeJsonString);
+        // 解析JSON输入
+        const parsedJson = JSON.parse(this.jsonInput);
         
         // 转换为XML格式
         const xml = this.jsonToXml(parsedJson);
@@ -618,6 +621,9 @@ export default {
         // 存储转换后的XML
         this.jsonResult = xml;
         this.completeJsonString = xml;
+        
+        // 设置为XML模式，并重置其他模式
+        this.resetAllFormatModes();
         this.isXmlMode = true;
         
         // 在视图中显示XML
@@ -626,7 +632,9 @@ export default {
         // 显示提示
         this.showToastMessage('已转换为XML格式');
       } catch (error) {
-        console.error('转换XML失败:', error);
+        this.jsonError = true;
+        this.jsonErrorMessage = error.message;
+        this.tryRepairJson();
         this.showToastMessage('转换XML失败');
       }
     },
@@ -725,7 +733,317 @@ export default {
       // 清空折叠状态并刷新显示
       this.collapsedLines = new Set();
       this.processVisibleLines();
-    }
+    },
+    // 重置所有格式模式
+    resetAllFormatModes() {
+      this.isXmlMode = false;
+      this.isYamlMode = false;
+      this.isCsvMode = false;
+    },
+    // 将 JSON 转换为 YAML
+    convertToYaml() {
+      if (!this.jsonInput.trim()) {
+        return;
+      }
+      
+      try {
+        // 解析JSON输入
+        const parsedJson = JSON.parse(this.jsonInput);
+        
+        // 转换为YAML格式
+        const yaml = this.jsonToYaml(parsedJson);
+        
+        // 存储转换后的YAML
+        this.jsonResult = yaml;
+        this.completeJsonString = yaml;
+        
+        // 设置为YAML模式，并重置其他模式
+        this.resetAllFormatModes();
+        this.isYamlMode = true;
+        
+        // 在视图中显示YAML
+        this.displayFormattedText(yaml, 'yaml');
+        
+        // 显示提示
+        this.showToastMessage('已转换为YAML格式');
+      } catch (error) {
+        this.jsonError = true;
+        this.jsonErrorMessage = error.message;
+        this.tryRepairJson();
+        this.showToastMessage('转换YAML失败');
+      }
+    },
+    
+    // JSON转YAML的核心算法
+    jsonToYaml(obj, level = 0) {
+      let yaml = '';
+      const indent = ' '.repeat(level * 2);
+      
+      if (Array.isArray(obj)) {
+        // 空数组特殊处理
+        if (obj.length === 0) {
+          return '[]';
+        }
+        
+        // 处理数组
+        for (const item of obj) {
+          yaml += `${indent}- `;
+          
+          if (item === null) {
+            yaml += 'null\n';
+          } else if (typeof item === 'object') {
+            // 对象或数组类型，需要换行并缩进
+            yaml += '\n' + this.jsonToYaml(item, level + 1);
+          } else if (typeof item === 'string') {
+            // 字符串可能需要引号
+            yaml += this.formatYamlString(item) + '\n';
+          } else {
+            // 其他简单类型
+            yaml += String(item) + '\n';
+          }
+        }
+      } else if (obj !== null && typeof obj === 'object') {
+        // 处理对象
+        for (const key in obj) {
+          yaml += `${indent}${key}: `;
+          
+          if (obj[key] === null) {
+            yaml += 'null\n';
+          } else if (typeof obj[key] === 'object') {
+            // 对象或数组类型，需要换行并缩进
+            yaml += '\n' + this.jsonToYaml(obj[key], level + 1);
+          } else if (typeof obj[key] === 'string') {
+            // 字符串可能需要引号
+            yaml += this.formatYamlString(obj[key]) + '\n';
+          } else {
+            // 其他简单类型
+            yaml += String(obj[key]) + '\n';
+          }
+        }
+      }
+      
+      return yaml;
+    },
+    
+    // 格式化YAML字符串，必要时添加引号
+    formatYamlString(str) {
+      // 检查是否需要引号
+      const needsQuotes = /[:{}[\],&*#?|<>=!%@`]/g.test(str) || 
+                          /^\s|\s$/g.test(str) || 
+                          ['true', 'false', 'null', 'y', 'n', 'yes', 'no', 'on', 'off'].includes(str.toLowerCase()) ||
+                          !isNaN(str);
+      
+      if (needsQuotes) {
+        // 转义双引号
+        const escaped = str.replace(/"/g, '\\"');
+        return `"${escaped}"`;
+      }
+      
+      return str;
+    },
+    
+    // 将 JSON 转换为 CSV
+    convertToCsv() {
+      if (!this.jsonInput.trim()) {
+        return;
+      }
+      
+      try {
+        // 解析JSON输入
+        const parsedJson = JSON.parse(this.jsonInput);
+        
+        // 转换为CSV格式
+        const csv = this.jsonToCsv(parsedJson);
+        
+        if (!csv) {
+          this.showToastMessage('此JSON结构无法转换为CSV格式');
+          return;
+        }
+        
+        // 存储转换后的CSV
+        this.jsonResult = csv;
+        this.completeJsonString = csv;
+        
+        // 设置为CSV模式，并重置其他模式
+        this.resetAllFormatModes();
+        this.isCsvMode = true;
+        
+        // 在视图中显示CSV
+        this.displayFormattedText(csv, 'csv');
+        
+        // 显示提示
+        this.showToastMessage('已转换为CSV格式');
+      } catch (error) {
+        this.jsonError = true;
+        this.jsonErrorMessage = error.message;
+        this.tryRepairJson();
+        this.showToastMessage('转换CSV失败');
+      }
+    },
+    
+    // JSON转CSV的核心算法
+    jsonToCsv(json) {
+      // 检查是否为数组
+      if (!Array.isArray(json)) {
+        // 如果是单个对象，将其包装为数组
+        if (typeof json === 'object' && json !== null) {
+          json = [json];
+        } else {
+          return null; // 无法转换为CSV
+        }
+      }
+      
+      // 如果数组为空，返回空字符串
+      if (json.length === 0) {
+        return '';
+      }
+      
+      // 提取所有可能的字段名
+      const fields = new Set();
+      json.forEach(item => {
+        if (item && typeof item === 'object') {
+          Object.keys(item).forEach(key => fields.add(key));
+        }
+      });
+      
+      const fieldArray = Array.from(fields);
+      
+      // 生成CSV头部
+      let csv = fieldArray.map(field => this.escapeCsvField(field)).join(',') + '\n';
+      
+      // 生成数据行
+      json.forEach(item => {
+        const row = fieldArray.map(field => {
+          const value = item[field];
+          
+          if (value === undefined || value === null) {
+            return '';
+          }
+          
+          if (typeof value === 'object') {
+            // 对象或数组转为JSON字符串
+            return this.escapeCsvField(JSON.stringify(value));
+          }
+          
+          return this.escapeCsvField(String(value));
+        });
+        
+        csv += row.join(',') + '\n';
+      });
+      
+      return csv;
+    },
+    
+    // 转义CSV字段
+    escapeCsvField(field) {
+      // 如果字段包含逗号、引号或换行，需要加引号并转义内部引号
+      if (/[",\n\r]/.test(field)) {
+        return '"' + field.replace(/"/g, '""') + '"';
+      }
+      return field;
+    },
+    
+    // 通用显示格式化文本的方法
+    displayFormattedText(text, formatType) {
+      const lines = text.split('\n');
+      
+      // 根据格式类型设置语法高亮
+      const highlightedLines = lines.map(line => {
+        if (formatType === 'yaml') {
+          return this.highlightYaml(line);
+        } else if (formatType === 'csv') {
+          return this.highlightCsv(line);
+        } else {
+          return line;
+        }
+      });
+      
+      this.formattedJson = highlightedLines.map((line, index) => {
+        const indentMatch = line.match(/^(\s*)/);
+        const indent = indentMatch ? indentMatch[0].length : 0;
+        
+        return {
+          originalIndex: index,
+          content: line,
+          indent: formatType === 'yaml' ? Math.floor(indent / 2) : 0,
+          type: `${formatType}-line`,
+          collapsed: false
+        };
+      });
+      
+      // 清空折叠状态并刷新显示
+      this.collapsedLines = new Set();
+      this.processVisibleLines();
+    },
+    
+    // YAML语法高亮
+    highlightYaml(line) {
+      // 高亮键
+      line = line.replace(/^(\s*)([^:]*?)(:)(?=\s|$)/g, (match, space, key, colon) => {
+        return `${space}<span class="yaml-key">${key}</span>${colon}`;
+      });
+      
+      // 高亮值
+      line = line.replace(/:\s+(.+?)$/g, (match, value) => {
+        if (/^[0-9]+(\.[0-9]+)?$/.test(value)) {
+          return `: <span class="yaml-number">${value}</span>`;
+        } else if (/^(true|false)$/i.test(value)) {
+          return `: <span class="yaml-boolean">${value}</span>`;
+        } else if (/^null$/i.test(value)) {
+          return `: <span class="yaml-null">${value}</span>`;
+        } else if (/^".*"$/.test(value) || /^'.*'$/.test(value)) {
+          return `: <span class="yaml-string">${value}</span>`;
+        }
+        return `: <span class="yaml-value">${value}</span>`;
+      });
+      
+      // 高亮数组标记
+      line = line.replace(/^(\s*)(-)(?=\s|$)/g, (match, space, dash) => {
+        return `${space}<span class="yaml-array-marker">${dash}</span>`;
+      });
+      
+      return line;
+    },
+    
+    // CSV语法高亮
+    highlightCsv(line) {
+      // 简单地将CSV头行高亮
+      if (line && this.formattedJson.length === 0) {
+        return `<span class="csv-header">${line}</span>`;
+      }
+      
+      // 分隔字段并单独高亮每个字段
+      const fields = this.splitCsvFields(line);
+      if (fields.length > 0) {
+        return fields.map(field => `<span class="csv-field">${field}</span>`).join(',');
+      }
+      
+      return line;
+    },
+    
+    // 分割CSV字段，考虑引号内的逗号
+    splitCsvFields(line) {
+      const fields = [];
+      let inQuotes = false;
+      let currentField = '';
+      
+      for (let i = 0; i < line.length; i++) {
+        const char = line[i];
+        
+        if (char === '"' && (i === 0 || line[i-1] !== '\\')) {
+          inQuotes = !inQuotes;
+          currentField += char;
+        } else if (char === ',' && !inQuotes) {
+          fields.push(currentField);
+          currentField = '';
+        } else {
+          currentField += char;
+        }
+      }
+      
+      fields.push(currentField);
+      return fields;
+    },
   }
 }
 </script>
@@ -1176,6 +1494,26 @@ export default {
   background: linear-gradient(135deg, rgba(156, 39, 176, 0.2) 0%, rgba(103, 58, 183, 0.2) 100%);
 }
 
+/* YAML转换按钮样式 */
+.tool-button.yaml-button {
+  background: linear-gradient(135deg, rgba(76, 175, 80, 0.1) 0%, rgba(46, 125, 50, 0.1) 100%);
+  color: #2e7d32;
+}
+
+.tool-button.yaml-button:hover {
+  background: linear-gradient(135deg, rgba(76, 175, 80, 0.2) 0%, rgba(46, 125, 50, 0.2) 100%);
+}
+
+/* CSV转换按钮样式 */
+.tool-button.csv-button {
+  background: linear-gradient(135deg, rgba(63, 81, 181, 0.1) 0%, rgba(48, 63, 159, 0.1) 100%);
+  color: #303f9f;
+}
+
+.tool-button.csv-button:hover {
+  background: linear-gradient(135deg, rgba(63, 81, 181, 0.2) 0%, rgba(48, 63, 159, 0.2) 100%);
+}
+
 /* XML语法高亮 */
 :deep(.xml-tag) {
   color: #0b75b8;
@@ -1192,5 +1530,44 @@ export default {
 :deep(.xml-comment) {
   color: #808080;
   font-style: italic;
+}
+
+/* YAML语法高亮 */
+:deep(.yaml-key) {
+  color: #0b75b8;
+}
+
+:deep(.yaml-value) {
+  color: #006400;
+}
+
+:deep(.yaml-string) {
+  color: #006400;
+}
+
+:deep(.yaml-number) {
+  color: #aa00aa;
+}
+
+:deep(.yaml-boolean) {
+  color: #1c00cf;
+}
+
+:deep(.yaml-null) {
+  color: #808080;
+}
+
+:deep(.yaml-array-marker) {
+  color: #d7ba7d;
+}
+
+/* CSV语法高亮 */
+:deep(.csv-header) {
+  font-weight: bold;
+  color: #0b75b8;
+}
+
+:deep(.csv-field) {
+  color: #333;
 }
 </style>
