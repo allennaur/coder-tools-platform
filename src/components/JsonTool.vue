@@ -130,17 +130,13 @@
       </div>
     </div>
     
-    <!-- 复制成功提示 -->
-    <div class="toast-container" :class="{ 'toast-show': showToast }">
-      <div class="toast-message">
-        <i class="fas fa-check-circle toast-icon"></i>
-        <span>{{ toastMessage }}</span>
-      </div>
-    </div>
+    <!-- 移除局部 Toast 组件 -->
   </div>
 </template>
 
 <script>
+import ToastService from '@/utils/ToastService';
+
 export default {
   name: 'JsonTool',
   data() {
@@ -162,8 +158,6 @@ export default {
       initialWidth: 0,
       containerWidth: 0,
       collapsedLines: new Set(), // 记录被折叠的行
-      showToast: false,
-      toastMessage: '',
       collapsibleRanges: [], // 存储可折叠范围 [开始行, 结束行]
       lineTypes: [], // 存储每行的类型 (object-start, array-start, object-end, array-end, key-value)
       hoveredLine: null, // 当前鼠标悬浮的行
@@ -463,11 +457,11 @@ export default {
       
       navigator.clipboard.writeText(textToCopy)
         .then(() => {
-          this.showToastMessage('复制成功');
+          ToastService.success('复制成功'); // 使用成功类型
         })
         .catch(err => {
           console.error('复制失败:', err);
-          this.showToastMessage('复制失败，请手动复制');
+          ToastService.error('复制失败，请手动复制'); // 使用错误类型
         });
     },
     handleHover() {
@@ -627,13 +621,7 @@ export default {
     
     // 显示自定义提示消息
     showToastMessage(message) {
-      this.toastMessage = message;
-      this.showToast = true;
-      
-      // 3秒后自动隐藏
-      setTimeout(() => {
-        this.showToast = false;
-      }, 3000);
+      ToastService.success(message);
     },
     
     // 检查行是否可折叠
@@ -758,7 +746,7 @@ export default {
       // 处理JSON以显示在右侧
       this.processJson();
       // 提示用户
-      this.showToastMessage('已插入示例JSON数据');
+      ToastService.info('已插入示例JSON数据'); // 使用信息类型
     },
     // 压缩JSON
     compressJson() {
@@ -1393,21 +1381,22 @@ export default {
   height: 100%;
   position: relative;
   background-color: rgba(255, 255, 255, 0.6);
-  border-radius: 15px;
+  border-radius: 20px; /* 调整为更符合VisionOS的圆角 */
   overflow: hidden;
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+  backdrop-filter: blur(30px); /* 增强毛玻璃效果，符合VisionOS风格 */
+  -webkit-backdrop-filter: blur(30px);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08); /* 柔和的阴影效果 */
   transform: translateZ(0);
   -webkit-font-smoothing: subpixel-antialiased;
+  border: 1px solid rgba(255, 255, 255, 0.5); /* 添加边框增强深度感 */
 }
 
 .json-panel {
   height: 100%;
   display: flex;
   flex-direction: column;
-  transition: width 0.25s cubic-bezier(0.215, 0.61, 0.355, 1); /* 更自然的过渡效果 */
-  will-change: width; /* 优化性能 */
+  transition: width 0.25s cubic-bezier(0.215, 0.61, 0.355, 1); 
+  will-change: width;
   min-width: 200px;
 }
 
@@ -1415,8 +1404,8 @@ export default {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 12px 15px;
-  background: rgba(255, 255, 255, 0.8);
+  padding: 14px 18px; /* 增加内间距 */
+  background: rgba(255, 255, 255, 0.7); /* 更轻微的背景色 */
   border-bottom: 1px solid rgba(0, 0, 0, 0.05);
   flex-shrink: 0;
   white-space: nowrap;
@@ -1425,7 +1414,7 @@ export default {
 .panel-header h3 {
   margin: 0;
   font-size: 16px;
-  font-weight: 600;
+  font-weight: 500; /* VisionOS倾向于使用中等粗细字体 */
   color: #333;
 }
 
@@ -1436,37 +1425,183 @@ export default {
 }
 
 .tool-button {
-  padding: 5px 10px;
+  padding: 6px 12px;
   border: none;
-  border-radius: 8px;
-  background: linear-gradient(135deg, rgba(255,76,197,0.1) 0%, rgba(151,47,246,0.1) 100%);
+  border-radius: 12px; /* 更大的圆角 */
+  background: rgba(255, 255, 255, 0.5); /* 更轻微的背景色 */
   color: #333;
   font-size: 12px;
+  font-weight: 500; /* 中等字重 */
   cursor: pointer;
   transition: all 0.2s ease;
   white-space: nowrap;
+  backdrop-filter: blur(10px); /* 添加模糊效果 */
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.5); /* 添加边框 */
 }
 
 .tool-button:hover {
-  background: linear-gradient(135deg, rgba(255,76,197,0.2) 0%, rgba(151,47,246,0.2) 100%);
+  background: rgba(255, 255, 255, 0.8);
   transform: translateY(-1px);
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+}
+
+/* 保持特有按钮样式，但调整为符合VisionOS的风格 */
+.tool-button.format-button {
+  background: rgba(0, 122, 255, 0.15);
+  color: #0077FF;
+  border: 1px solid rgba(0, 122, 255, 0.3);
+}
+
+.tool-button.format-button:hover {
+  background: rgba(0, 122, 255, 0.25);
+}
+
+.tool-button.compress-button {
+  background: rgba(255, 149, 0, 0.15);
+  color: #FF9500;
+  border: 1px solid rgba(255, 149, 0, 0.3);
+}
+
+.tool-button.compress-button:hover {
+  background: rgba(255, 149, 0, 0.25);
+}
+
+.tool-button.xml-button {
+  background: rgba(175, 82, 222, 0.15);
+  color: #AF52DE;
+  border: 1px solid rgba(175, 82, 222, 0.3);
+}
+
+.tool-button.xml-button:hover {
+  background: rgba(175, 82, 222, 0.25);
+}
+
+.tool-button.yaml-button {
+  background: rgba(52, 199, 89, 0.15);
+  color: #34C759;
+  border: 1px solid rgba(52, 199, 89, 0.3);
+}
+
+.tool-button.yaml-button:hover {
+  background: rgba(52, 199, 89, 0.25);
+}
+
+.tool-button.csv-button {
+  background: rgba(88, 86, 214, 0.15);
+  color: #5856D6;
+  border: 1px solid rgba(88, 86, 214, 0.3);
+}
+
+.tool-button.csv-button:hover {
+  background: rgba(88, 86, 214, 0.25);
+}
+
+/* 更新禁用按钮样式以符合VisionOS风格 */
+.tool-button.disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none !important;
+  background: rgba(0, 0, 0, 0.05) !important;
+  color: #999 !important;
+  box-shadow: none !important;
+  border: 1px solid rgba(0, 0, 0, 0.05) !重要;
 }
 
 .json-textarea {
   flex: 1;
   width: 100%;
-  padding: 15px;
+  padding: 16px;
   border: none;
   resize: none;
   font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, Courier, monospace;
   font-size: 14px;
-  line-height: 1.5;
+  line-height: 1.6;
   color: #333;
-  background-color: transparent;
+  background-color: rgba(255, 255, 255, 0.3); /* 轻微的背景色 */
   outline: none;
   overflow-y: auto;
+  border-radius: 12px; /* 内部元素也增加圆角 */
+  margin: 10px; /* 添加边距使文本区域不贴边 */
+  backdrop-filter: blur(5px); /* 文本区域的模糊效果 */
+  -webkit-backdrop-filter: blur(5px);
 }
 
+/* 优化拖拽手柄样式，符合VisionOS风格 */
+.resize-handle {
+  width: 12px;
+  height: 100%;
+  background-color: transparent;
+  cursor: col-resize;
+  z-index: 10;
+  margin: 0 -6px;
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  touch-action: none;
+}
+
+.handle-grip {
+  width: 4px; /* 略微加粗 */
+  height: 80px; /* 默认更长 */
+  background: rgba(0, 0, 0, 0.1); /* 更轻柔的颜色 */
+  border-radius: 4px;
+  transition: all 0.2s ease;
+}
+
+.resize-handle:hover .handle-grip,
+.resize-handle.hover .handle-grip {
+  height: 120px;
+  background: rgba(0, 0, 0, 0.15);
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.05);
+}
+
+.resize-handle.active .handle-grip {
+  height: 160px; /* 拖动时更长 */
+  background: rgba(0, 0, 0, 0.2);
+  box-shadow: 0 0 30px rgba(0, 0, 0, 0.1);
+}
+
+/* 修改折叠按钮为VisionOS风格 */
+.toggle-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  font-size: 16px;
+  font-weight: 400; /* VisionOS使用较轻的字重 */
+  cursor: pointer;
+  user-select: none;
+  color: #0077FF; /* 使用苹果标准蓝色 */
+  background-color: rgba(0, 122, 255, 0.1);
+  border-radius: 10px; /* 圆形按钮 */
+  transition: all 0.2s ease;
+  border: 1px solid rgba(0, 122, 255, 0.2);
+}
+
+.toggle-btn:hover {
+  background-color: rgba(0, 122, 255, 0.2);
+  transform: scale(1.1);
+}
+
+/* 更新格式指示器样式 */
+.format-indicator {
+  font-size: 14px;
+  font-weight: normal;
+  color: #666;
+  margin-left: 8px;
+  background-color: rgba(0, 0, 0, 0.05);
+  padding: 3px 10px;
+  border-radius: 12px;
+  display: inline-block;
+  vertical-align: middle;
+  backdrop-filter: blur(5px);
+  -webkit-backdrop-filter: blur(5px);
+}
+
+/* ...保留其他未更改的样式... */
 .json-result {
   flex: 1;
   width: 100%;
@@ -1957,5 +2092,58 @@ export default {
   background: rgba(0, 0, 0, 0.05) !important;
   transform: none !important;
   box-shadow: none !important;
+}
+
+/* 增强文本区域的焦点状态样式 */
+.json-textarea:focus {
+  outline: none;
+  box-shadow: inset 0 0 0 1px rgba(0, 122, 255, 0.3);
+  border: none;
+}
+
+/* 按钮焦点样式 */
+.tool-button:focus {
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(0, 122, 255, 0.2);
+  border-color: rgba(0, 122, 255, 0.4);
+}
+
+/* 确保禁用按钮没有焦点效果 */
+.tool-button.disabled:focus {
+  outline: none;
+  box-shadow: none;
+  border-color: rgba(0, 0, 0, 0.05);
+}
+
+/* 修复按钮重新开始的焦点样式问题 */
+.tool-button.format-button:focus {
+  box-shadow: 0 0 0 2px rgba(0, 122, 255, 0.2);
+  border-color: rgba(0, 122, 255, 0.5);
+}
+
+.tool-button.compress-button:focus {
+  box-shadow: 0 0 0 2px rgba(255, 149, 0, 0.2);
+  border-color: rgba(255, 149, 0, 0.5);
+}
+
+.tool-button.xml-button:focus {
+  box-shadow: 0 0 0 2px rgba(175, 82, 222, 0.2);
+  border-color: rgba(175, 82, 222, 0.5);
+}
+
+.tool-button.yaml-button:focus {
+  box-shadow: 0 0 0 2px rgba(52, 199, 89, 0.2);
+  border-color: rgba(52, 199, 89, 0.5);
+}
+
+.tool-button.csv-button:focus {
+  box-shadow: 0 0 0 2px rgba(88, 86, 214, 0.2);
+  border-color: rgba(88, 86, 214, 0.5);
+}
+
+/* 修复折叠按钮的焦点样式 */
+.toggle-btn:focus {
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(0, 122, 255, 0.2);
 }
 </style>
