@@ -160,6 +160,7 @@ input:checked + .toggle-slider:before {
   border: 1px solid rgba(255, 255, 255, 0.7);
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
   transition: all 0.3s ease;
+  min-width: 260px;
 }
 
 .conversion-card:hover {
@@ -179,6 +180,7 @@ input:checked + .toggle-slider:before {
   display: flex;
   flex-direction: column;
   gap: 16px;
+  overflow: hidden;
 }
 
 .card-footer {
@@ -193,6 +195,7 @@ input:checked + .toggle-slider:before {
 /* 输入组和结果组 */
 .input-group {
   margin-bottom: 8px;
+  overflow: hidden;
 }
 
 .input-with-select {
@@ -201,6 +204,8 @@ input:checked + .toggle-slider:before {
   border: 1px solid rgba(0, 0, 0, 0.1);
   overflow: hidden;
   background: white;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .input-with-select input {
@@ -209,6 +214,7 @@ input:checked + .toggle-slider:before {
   padding: 10px 12px;
   outline: none;
   font-size: 14px;
+  min-width: 0;
 }
 
 .precision-select {
@@ -262,6 +268,7 @@ input:checked + .toggle-slider:before {
   background: rgba(255, 255, 255, 0.4);
   padding: 8px 12px;
   border-radius: 10px;
+  overflow: hidden;
 }
 
 .result-item label {
@@ -279,6 +286,9 @@ input:checked + .toggle-slider:before {
   font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, Courier, monospace;
   font-size: 14px;
   padding: 4px 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  min-width: 0;
 }
 
 /* 工具按钮样式 */

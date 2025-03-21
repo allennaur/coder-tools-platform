@@ -96,4 +96,42 @@ button, [role="button"] {
 button:active, [role="button"]:active {
   transform: scale(0.98);
 }
+
+/* 添加全局输入框样式，确保所有工具中输入区域表现一致 */
+input, textarea, select {
+  box-sizing: border-box;
+}
+
+.panel-content {
+  overflow: hidden;
+  position: relative;
+}
+
+/* 确保flex容器中的子元素正确缩放 */
+.flex-container {
+  display: flex;
+  min-width: 0;
+  min-height: 0;
+}
+
+.flex-item {
+  min-width: 0;
+  min-height: 0;
+  overflow: hidden;
+}
+
+/* 优化输入容器的边界显示 */
+.input-container {
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+/* 确保滚动容器不会意外溢出 */
+.scroll-container {
+  overflow: auto;
+  -webkit-overflow-scrolling: touch;
+  max-width: 100%;
+}
 </style>

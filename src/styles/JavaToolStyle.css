@@ -46,6 +46,8 @@
   border: 1px solid rgba(255, 255, 255, 0.7);
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
   transition: all 0.3s ease;
+  /* 增加最小宽度，确保能显示完整 */
+  min-width: 200px;
 }
 
 .input-panel:hover {
@@ -78,7 +80,7 @@
 
 .string-textarea {
   flex: 1;
-  width: 100%;
+  width: calc(100% - 20px); /* 修改：考虑左右margin各10px */
   padding: 16px;
   border: none;
   resize: none;
@@ -93,6 +95,7 @@
   border-radius: 12px;
   backdrop-filter: blur(5px);
   -webkit-backdrop-filter: blur(5px);
+  box-sizing: border-box; /* 添加box-sizing确保尺寸计算正确 */
 }
 
 .operation-panel {

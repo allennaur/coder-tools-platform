@@ -29,6 +29,8 @@
               box-shadow 0.4s ease; 
   will-change: width;
   min-width: 200px;
+  /* 增加溢出控制 */
+  overflow: hidden;
 }
 
 .panel-header {
@@ -186,7 +188,7 @@
 
 .json-textarea {
   flex: 1;
-  width: 100%;
+  width: calc(100% - 20px); /* 修改：考虑左右margin各10px */
   padding: 16px;
   border: none;
   resize: none;
@@ -201,6 +203,7 @@
   margin: 10px; /* 添加边距使文本区域不贴边 */
   backdrop-filter: blur(5px); /* 文本区域的模糊效果 */
   -webkit-backdrop-filter: blur(5px);
+  box-sizing: border-box; /* 添加box-sizing确保尺寸计算正确 */
 }
 
 /* 优化拖拽手柄样式，符合VisionOS风格 */
@@ -860,18 +863,18 @@
   left: 0 !important;
   right: 0 !important;
   bottom: 0 !important;
-  width: 100vw !important;
-  height: 100vh !important;
-  z-index: 9999 !important;
-  border-radius: 0 !important;
-  background-color: rgba(245, 245, 250, 0.98) !important;
+  width: 100vw !重要;
+  height: 100vh !重要;
+  z-index: 9999 !重要;
+  border-radius: 0 !重要;
+  background-color: rgba(245, 245, 250, 0.98) !重要;
   /* 添加内边距，确保内容与浏览器边缘保持距离 */
-  padding: 20px !important;
-  box-sizing: border-box !important;
+  padding: 20px !重要;
+  box-sizing: border-box !重要;
   /* 添加动画效果的状态变化 */
-  transform: scale(1) !important;
-  opacity: 1 !important;
-  transition: all 0.45s cubic-bezier(0.2, 1, 0.3, 1) !important;
+  transform: scale(1) !重要;
+  opacity: 1 !重要;
+  transition: all 0.45s cubic-bezier(0.2, 1, 0.3, 1) !重要;
 }
 
 /* 全屏进入和退出动画 */
@@ -893,22 +896,22 @@
 /* 全屏模式下JSON面板的动画效果 */
 .fullscreen-mode .json-panel {
   /* 确保JSON面板在全屏模式下也有圆角 */
-  border-radius: 16px !important;
+  border-radius: 16px !重要;
   /* 添加内容容器的背景半透明效果 */
-  background-color: rgba(255, 255, 255, 0.6) !important;
+  background-color: rgba(255, 255, 255, 0.6) !重要;
   /* 为面板添加微妙的阴影 */
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.05) !important;
-  transition: all 0.4s cubic-bezier(0.22, 1, 0.36, 1) !important; /* 平滑过渡效果 */
-  transition: all 0.45s cubic-bezier(0.2, 1, 0.3, 1) !important;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.05) !重要;
+  transition: all 0.4s cubic-bezier(0.22, 1, 0.36, 1) !重要; /* 平滑过渡效果 */
+  transition: all 0.45s cubic-bezier(0.2, 1, 0.3, 1) !重要;
 }
 
 .fullscreen-mode .resize-handle {
-  display: none !important;
+  display: none !重要;
 }
 
 /* 在全屏模式下调整左右面板宽度 */
 .fullscreen-mode .json-panel {
-  transition: width 0.3s cubic-bezier(0.215, 0.61, 0.355, 1) !important;
+  transition: width 0.3s cubic-bezier(0.215, 0.61, 0.355, 1) !重要;
 }
 
 /* 全屏模式相关样式优化 */
@@ -922,33 +925,33 @@
 
 /* 全屏模式样式 - 改进过渡效果 */
 .fullscreen-mode {
-  position: fixed !important;
-  top: 0 !important;
-  left: 0 !important;
-  right: 0 !important;
-  bottom: 0 !important;
-  width: 100vw !important;
-  height: 100vh !important;
-  z-index: 9999 !important;
-  border-radius: 0 !important;
-  background-color: rgba(245, 245, 250, 0.98) !important;
-  padding: 20px !important;
-  box-sizing: border-box !important;
-  transform: scale(1) !important;
-  opacity: 1 !important;
+  position: fixed !重要;
+  top: 0 !重要;
+  left: 0 !重要;
+  right: 0 !重要;
+  bottom: 0 !重要;
+  width: 100vw !重要;
+  height: 100vh !重要;
+  z-index: 9999 !重要;
+  border-radius: 0 !重要;
+  background-color: rgba(245, 245, 250, 0.98) !重要;
+  padding: 20px !重要;
+  box-sizing: border-box !重要;
+  transform: scale(1) !重要;
+  opacity: 1 !重要;
 }
 
 /* 移除不需要的全屏叠加层样式 */
 .fullscreen-overlay {
-  display: none !important;
+  display: none !重要;
 }
 
 /* 调整面板全屏模式样式，增强过渡效果 */
 .fullscreen-mode .json-panel {
-  border-radius: 16px !important;
-  background-color: rgba(255, 255, 255, 0.6) !important;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.05) !important;
-  transition: all 0.45s cubic-bezier(0.2, 1, 0.3, 1) !important;
+  border-radius: 16px !重要;
+  background-color: rgba(255, 255, 255, 0.6) !重要;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.05) !重要;
+  transition: all 0.45s cubic-bezier(0.2, 1, 0.3, 1) !重要;
 }
 
 /* 全屏按钮样式优化 */
@@ -962,9 +965,9 @@
 
 /* 退出全屏临时样式 - 为了增强动画效果 */
 .exiting-fullscreen {
-  transform: scale(0.95) !important;
-  opacity: 0.9 !important;
-  transition: all 0.45s cubic-bezier(0.2, 1, 0.3, 1) !important;
+  transform: scale(0.95) !重要;
+  opacity: 0.9 !重要;
+  transition: all 0.45s cubic-bezier(0.2, 1, 0.3, 1) !重要;
 }
 
 /* 全屏模式下的背景叠加效果 */
@@ -988,5 +991,5 @@
 
 /* 退出全屏按钮 */
 .exit-fullscreen-btn {
-  display: none !important;
+  display: none !重要;
 }
