@@ -75,6 +75,7 @@
 
 <script>
 import JsonTool from './JsonTool.vue';
+import StorageService from '@/utils/StorageService';
 
 export default {
   name: 'HelloWorld',
@@ -86,7 +87,7 @@ export default {
   },
   data() {
     return {
-      activeMenu: 'home',
+      activeMenu: 'home', // 默认值会被恢复的状态覆盖
       hoverMenu: null,
       activeMenuIndex: 0, 
       menus: [
@@ -117,6 +118,20 @@ export default {
       ]
     }
   },
+  mounted() {
+    // 恢复上一次的应用状态
+    this.restoreState();
+    
+    // 监听浏览器关闭或刷新事件
+    window.addEventListener('beforeunload', this.saveCurrentState);
+  },
+  beforeUnmount() {
+    // 保存当前状态
+    this.saveCurrentState();
+    
+    // 移除事件监听
+    window.removeEventListener('beforeunload', this.saveCurrentState);
+  },
   computed: {
     activeIndicatorStyle() {
       const menuIndex = this.menus.findIndex(menu => menu.id === this.activeMenu);
@@ -142,6 +157,8 @@ export default {
     
     switchMenu(menuId) {
       this.activeMenu = menuId;
+      this.saveCurrentState(); // 每次切换菜单时保存状态
+      
       // 在状态更新后调用方法更新索引
       this.$nextTick(() => {
         this.updateActiveMenuIndex();
@@ -167,6 +184,49 @@ export default {
     },
     handleMouseLeave() {
       this.hoverMenu = null;
+    },
+    // 保存当前应用状态
+    saveCurrentState() {
+      const appState = {
+        activeMenu: this.activeMenu
+      };
+      
+      StorageService.updateSection('appState', appState);
+    },
+    
+    // 恢复应用状态
+    restoreState() {
+      const savedState = StorageService.getSection('appState');
+      
+      if (savedState) {
+        // 恢复激活的菜单
+        if (savedState.activeMenu) {
+          // 验证菜单ID是否有效
+          const validMenu = this.menus.some(menu => menu.id === savedState.activeMenu);
+          if (validMenu) {
+            this.activeMenu = savedState.activeMenu;
+            
+            // 在下一个渲染周期更新UI状态
+            this.$nextTick(() => {
+              this.updateActiveMenuIndex();
+              
+              // 显示通知
+              const menuName = this.menus.find(menu => menu.id === savedState.activeMenu).label;
+              setTimeout(() => {
+                const toastMessage = this.activeMenu === 'home' ? 
+                  '欢迎回来！已恢复到主页' : 
+                  `已恢复到上次使用的${menuName}`;
+                
+                // 使用ToastService显示通知
+                const ToastService = this.$root.$toast || window.$toast;
+                if (ToastService && ToastService.info) {
+                  ToastService.info(toastMessage);
+                }
+              }, 500); // 延迟显示通知，让页面有足够时间渲染
+            });
+          }
+        }
+      }
     }
   }
 }

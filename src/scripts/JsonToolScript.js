@@ -1,4 +1,5 @@
 import ToastService from '@/utils/ToastService';
+import StorageService from '@/utils/StorageService';
 
 export default {
   data() {
@@ -35,6 +36,8 @@ export default {
       animationInProgress: false, // 标记是否有动画正在进行中
       isFullScreen: false, // 添加全屏状态标志
       previousPanelState: null, // 用于存储全屏前的面板状态
+      // 防抖定时器
+      saveStateDebounceTimer: null,
     }
   },
   computed: {
@@ -58,11 +61,17 @@ export default {
       // 挂载后立即测量两侧面板头部实际宽度
       this.measurePanelsWidth();
       window.addEventListener('resize', this.measurePanelsWidth);
+      
+      // 恢复上次的JSON工具状态
+      this.restoreJsonToolState();
     });
     window.addEventListener('resize', this.handleResize);
     
     // 添加ESC键退出全屏
     document.addEventListener('keydown', this.handleEscKey);
+    
+    // 添加窗口关闭前保存状态
+    window.addEventListener('beforeunload', this.saveJsonToolState);
   },
   beforeUnmount() {
     if (this.isFullScreen) {
@@ -75,6 +84,12 @@ export default {
     
     // 添加ESC键监听器清理
     document.removeEventListener('keydown', this.handleEscKey);
+    
+    // 移除状态保存的事件监听
+    window.removeEventListener('beforeunload', this.saveJsonToolState);
+    
+    // 确保在组件销毁前保存一次状态
+    this.saveJsonToolState();
   },
   methods: {
     handleResize() {
@@ -158,6 +173,9 @@ export default {
         
         // 格式化并处理显示
         this.formatJsonToHtml(parsedJson);
+        
+        // 保存JSON状态（使用防抖，避免频繁保存）
+        this.debounceSaveState();
       } catch (error) {
         this.jsonError = true;
         this.jsonErrorMessage = error.message;
@@ -319,6 +337,9 @@ export default {
       this.completeJsonString = ''; // 确保完整的JSON字符串也被清空
       this.collapsedLines = new Set(); // 重置折叠状态
       this.currentFormat = 'JSON';
+      
+      // 保存状态（清空后的状态）
+      this.debounceSaveState();
     },
     copyToClipboard() {
       if (!this.hasOutputContent) return;
@@ -522,6 +543,9 @@ export default {
       }
       
       this.processVisibleLines();
+      
+      // 添加状态保存
+      this.debounceSaveState();
     },
     
     // 处理可见行
@@ -654,6 +678,9 @@ export default {
         
         // 显示提示
         this.showToastMessage('JSON 已压缩');
+        
+        // 添加状态保存
+        this.debounceSaveState();
       } catch (error) {
         this.jsonError = true;
         this.jsonErrorMessage = error.message;
@@ -694,6 +721,9 @@ export default {
         
         // 显示提示
         this.showToastMessage('JSON 已格式化');
+        
+        // 添加状态保存
+        this.debounceSaveState();
       } catch (error) {
         this.jsonError = true;
         this.jsonErrorMessage = error.message;
@@ -738,6 +768,9 @@ export default {
         
         // 显示提示
         this.showToastMessage('已转换为XML格式');
+        
+        // 添加状态保存
+        this.debounceSaveState();
       } catch (error) {
         this.jsonError = true;
         this.jsonErrorMessage = error.message;
@@ -891,6 +924,9 @@ export default {
         
         // 显示提示
         this.showToastMessage('已转换为YAML格式');
+        
+        // 添加状态保存
+        this.debounceSaveState();
       } catch (error) {
         this.jsonError = true;
         this.jsonErrorMessage = error.message;
@@ -1008,6 +1044,9 @@ export default {
         
         // 显示提示
         this.showToastMessage('已转换为CSV格式');
+        
+        // 添加状态保存
+        this.debounceSaveState();
       } catch (error) {
         this.jsonError = true;
         this.jsonErrorMessage = error.message;
@@ -1256,6 +1295,9 @@ export default {
       } else {
         this.enterFullScreen();
       }
+      
+      // 添加状态保存
+      this.debounceSaveState();
     },
     
     enterFullScreen() {
@@ -1326,6 +1368,97 @@ export default {
     handleEscKey(event) {
       if (event.key === 'Escape' && this.isFullScreen) {
         this.exitFullScreen();
+      }
+    },
+    
+    // 使用防抖保存状态
+    debounceSaveState() {
+      if (this.saveStateDebounceTimer) {
+        clearTimeout(this.saveStateDebounceTimer);
+      }
+      
+      this.saveStateDebounceTimer = setTimeout(() => {
+        this.saveJsonToolState();
+      }, 500); // 500ms防抖延迟
+    },
+    
+    // 保存JSON工具的状态
+    saveJsonToolState() {
+      // 只保存必要的数据，不保存处理结果（可以重新计算）
+      const jsonToolState = {
+        jsonInput: this.jsonInput,
+        leftPanelWidth: this.leftPanelWidth,
+        currentFormat: this.currentFormat,
+        collapsedLines: Array.from(this.collapsedLines),
+        isFullScreen: this.isFullScreen
+      };
+      
+      // 保存状态
+      StorageService.updateSection('jsonTool', jsonToolState);
+    },
+    
+    // 恢复JSON工具的状态
+    restoreJsonToolState() {
+      const savedState = StorageService.getSection('jsonTool');
+      
+      if (savedState) {
+        // 恢复面板宽度
+        if (typeof savedState.leftPanelWidth === 'number') {
+          this.leftPanelWidth = savedState.leftPanelWidth;
+        }
+        
+        // 恢复JSON输入
+        if (savedState.jsonInput && typeof savedState.jsonInput === 'string') {
+          this.jsonInput = savedState.jsonInput;
+          
+          // 如果有输入内容，处理JSON以显示结果
+          if (this.jsonInput.trim()) {
+            // 延迟处理，确保组件已完全渲染
+            setTimeout(() => {
+              // 恢复格式
+              if (savedState.currentFormat) {
+                // 根据保存的格式选择不同的处理方法
+                switch(savedState.currentFormat) {
+                  case 'JSON':
+                    this.formatJson();
+                    break;
+                  case 'JSON (压缩)':
+                    this.compressJson();
+                    break;
+                  case 'XML':
+                    this.convertToXml();
+                    break;
+                  case 'YAML':
+                    this.convertToYaml();
+                    break;
+                  case 'CSV':
+                    this.convertToCsv();
+                    break;
+                  default:
+                    this.formatJson();
+                }
+              } else {
+                this.processJson();
+              }
+              
+              // 恢复折叠状态
+              if (Array.isArray(savedState.collapsedLines)) {
+                this.collapsedLines = new Set(savedState.collapsedLines);
+                this.processVisibleLines();
+              }
+              
+              // 恢复全屏状态
+              if (savedState.isFullScreen) {
+                // 延迟进入全屏，确保内容已渲染
+                setTimeout(() => {
+                  this.enterFullScreen();
+                }, 300);
+              }
+              
+              // 不显示toast，因为父组件已经有恢复提示了
+            }, 200);
+          }
+        }
       }
     },
   }

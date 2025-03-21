@@ -7,12 +7,23 @@
 <script>
 import HelloWorld from './components/HelloWorld.vue'
 import Toast from './components/common/Toast.vue'
+import ToastService from './utils/ToastService'
 
 export default {
   name: 'App',
   components: {
     HelloWorld,
     Toast
+  },
+  data() {
+    return {
+      toast: ToastService
+    }
+  },
+  provide() {
+    return {
+      toast: this.toast
+    }
   }
 }
 </script>
