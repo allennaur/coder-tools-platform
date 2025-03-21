@@ -116,6 +116,8 @@ export default {
       repairSuggestion: '',
       leftPanelWidth: 50,
       minPanelWidth: 200,
+      leftMinPanelWidth: 200, // 左侧面板动态最小宽度
+      rightMinPanelWidth: 200, // 右侧面板动态最小宽度
       isResizing: false,
       isHovering: false,
       initialX: 0,
@@ -139,11 +141,15 @@ export default {
   mounted() {
     this.$nextTick(() => {
       this.containerWidth = this.$el.offsetWidth;
+      // 挂载后立即测量两侧面板头部实际宽度
+      this.measurePanelsWidth();
+      window.addEventListener('resize', this.measurePanelsWidth);
     });
     window.addEventListener('resize', this.handleResize);
   },
   beforeUnmount() {
     window.removeEventListener('resize', this.handleResize);
+    window.removeEventListener('resize', this.measurePanelsWidth);
     document.removeEventListener('mousemove', this.doResize);
     document.removeEventListener('mouseup', this.stopResize);
   },
@@ -153,11 +159,35 @@ export default {
       this.adjustPanelsWidth();
     },
     adjustPanelsWidth() {
-      const minPercent = (this.minPanelWidth / this.containerWidth) * 100;
-      if (this.leftPanelWidth < minPercent) {
-        this.leftPanelWidth = minPercent;
-      } else if (this.leftPanelWidth > (100 - minPercent)) {
-        this.leftPanelWidth = 100 - minPercent;
+      // 将像素值转换为百分比
+      const leftMinPercent = (this.leftMinPanelWidth / this.containerWidth) * 100;
+      const rightMinPercent = (this.rightMinPanelWidth / this.containerWidth) * 100;
+      
+      // 检查总体是否超出容器宽度
+      const totalMinPercent = leftMinPercent + rightMinPercent;
+      
+      if (totalMinPercent > 100) {
+        // 如果两侧最小宽度总和超过容器宽度，按比例分配
+        const ratio = 100 / totalMinPercent;
+        const adjustedLeftPercent = leftMinPercent * ratio;
+        const adjustedRightPercent = rightMinPercent * ratio;
+        
+        this.leftPanelWidth = Math.max(this.leftPanelWidth, adjustedLeftPercent);
+        
+        // 确保右侧不小于最小宽度
+        if ((100 - this.leftPanelWidth) < adjustedRightPercent) {
+          this.leftPanelWidth = 100 - adjustedRightPercent;
+        }
+      } else {
+        // 正常情况下确保两侧面板不小于最小宽度
+        if (this.leftPanelWidth < leftMinPercent) {
+          this.leftPanelWidth = leftMinPercent;
+        }
+        
+        // 确保右侧不小于最小宽度
+        if ((100 - this.leftPanelWidth) < rightMinPercent) {
+          this.leftPanelWidth = 100 - rightMinPercent;
+        }
       }
     },
     isExpandable(line) {
@@ -405,12 +435,25 @@ export default {
       const deltaX = event.clientX - this.initialX;
       const deltaPercentage = (deltaX / this.containerWidth) * 100;
       
-      const minPercent = (this.minPanelWidth / this.containerWidth) * 100;
+      // 计算新的左侧面板宽度百分比
+      let newLeftPanelWidth = this.initialWidth + deltaPercentage;
       
-      let newWidth = this.initialWidth + deltaPercentage;
-      newWidth = Math.min(Math.max(newWidth, minPercent), 100 - minPercent);
+      // 将左右两侧最小宽度转为百分比
+      const leftMinPercent = (this.leftMinPanelWidth / this.containerWidth) * 100;
+      const rightMinPercent = (this.rightMinPanelWidth / this.containerWidth) * 100;
       
-      this.leftPanelWidth = newWidth;
+      // 检查左侧是否达到最小宽度
+      if (newLeftPanelWidth < leftMinPercent) {
+        newLeftPanelWidth = leftMinPercent;
+      }
+      
+      // 检查右侧是否达到最小宽度
+      if ((100 - newLeftPanelWidth) < rightMinPercent) {
+        newLeftPanelWidth = 100 - rightMinPercent;
+      }
+      
+      // 更新面板宽度
+      this.leftPanelWidth = newLeftPanelWidth;
     },
     stopResize() {
       this.isResizing = false;
@@ -576,6 +619,11 @@ export default {
         // 设置当前格式
         this.currentFormat = 'JSON (压缩)';
         
+        // 状态改变后重新测量面板宽度
+        this.$nextTick(() => {
+          this.measurePanelsWidth();
+        });
+        
         // 显示提示
         this.showToastMessage('JSON 已压缩');
       } catch (error) {
@@ -608,6 +656,11 @@ export default {
         
         // 设置当前格式
         this.currentFormat = 'JSON';
+        
+        // 状态改变后重新测量面板宽度
+        this.$nextTick(() => {
+          this.measurePanelsWidth();
+        });
         
         // 显示提示
         this.showToastMessage('JSON 已格式化');
@@ -644,6 +697,11 @@ export default {
         
         // 在视图中显示XML
         this.displayXml(xml);
+        
+        // 状态改变后重新测量面板宽度
+        this.$nextTick(() => {
+          this.measurePanelsWidth();
+        });
         
         // 显示提示
         this.showToastMessage('已转换为XML格式');
@@ -756,6 +814,11 @@ export default {
       this.isYamlMode = false;
       this.isCsvMode = false;
       this.currentFormat = 'JSON';
+      
+      // 状态变化后重新测量面板宽度
+      this.$nextTick(() => {
+        this.measurePanelsWidth();
+      });
     },
     // 将 JSON 转换为 YAML
     convertToYaml() {
@@ -783,6 +846,11 @@ export default {
         
         // 在视图中显示YAML
         this.displayFormattedText(yaml, 'yaml');
+        
+        // 状态改变后重新测量面板宽度
+        this.$nextTick(() => {
+          this.measurePanelsWidth();
+        });
         
         // 显示提示
         this.showToastMessage('已转换为YAML格式');
@@ -893,6 +961,11 @@ export default {
         
         // 在视图中显示CSV
         this.displayFormattedText(csv, 'csv');
+        
+        // 状态改变后重新测量面板宽度
+        this.$nextTick(() => {
+          this.measurePanelsWidth();
+        });
         
         // 显示提示
         this.showToastMessage('已转换为CSV格式');
@@ -1067,6 +1140,63 @@ export default {
       fields.push(currentField);
       return fields;
     },
+    // 新增方法：测量两侧面板头部宽度
+    measurePanelsWidth() {
+      this.$nextTick(() => {
+        // 测量左侧面板头部宽度
+        const leftHeader = this.$el.querySelector('.json-input-panel .panel-header');
+        if (leftHeader) {
+          const leftTitle = leftHeader.querySelector('h3');
+          const leftActions = leftHeader.querySelector('.panel-actions');
+          
+          if (leftTitle && leftActions) {
+            const leftTitleWidth = leftTitle.getBoundingClientRect().width;
+            const leftActionsWidth = leftActions.getBoundingClientRect().width;
+            
+            // 计算内边距
+            const leftStyle = window.getComputedStyle(leftHeader);
+            const leftPaddingLeft = parseInt(leftStyle.paddingLeft) || 0;
+            const leftPaddingRight = parseInt(leftStyle.paddingRight) || 0;
+            
+            // 计算左侧所需最小宽度（添加缓冲区）
+            const leftMinWidth = leftTitleWidth + leftActionsWidth + leftPaddingLeft + leftPaddingRight + 40;
+            
+            // 更新左侧最小宽度（不小于基础最小宽度）
+            this.leftMinPanelWidth = Math.max(this.minPanelWidth, leftMinWidth);
+            
+            console.log('左侧面板最小宽度:', this.leftMinPanelWidth, 'px');
+          }
+        }
+        
+        // 测量右侧面板头部宽度
+        const rightHeader = this.$el.querySelector('.json-result-panel .panel-header');
+        if (rightHeader) {
+          const rightTitle = rightHeader.querySelector('h3');
+          const rightActions = rightHeader.querySelector('.panel-actions');
+          
+          if (rightTitle && rightActions) {
+            const rightTitleWidth = rightTitle.getBoundingClientRect().width;
+            const rightActionsWidth = rightActions.getBoundingClientRect().width;
+            
+            // 计算内边距
+            const rightStyle = window.getComputedStyle(rightHeader);
+            const rightPaddingLeft = parseInt(rightStyle.paddingLeft) || 0;
+            const rightPaddingRight = parseInt(rightStyle.paddingRight) || 0;
+            
+            // 计算右侧所需最小宽度（添加缓冲区）
+            const rightMinWidth = rightTitleWidth + rightActionsWidth + rightPaddingLeft + rightPaddingRight + 40;
+            
+            // 更新右侧最小宽度（不小于基础最小宽度）
+            this.rightMinPanelWidth = Math.max(this.minPanelWidth, rightMinWidth);
+            
+            console.log('右侧面板最小宽度:', this.rightMinPanelWidth, 'px');
+          }
+        }
+        
+        // 测量完成后调整面板宽度
+        this.adjustPanelsWidth();
+      });
+    },
   }
 }
 </script>
@@ -1163,24 +1293,26 @@ export default {
 }
 
 .resize-handle {
-  width: 4px;
+  width: 8px; /* 增加宽度，更容易点击 */
   height: 100%;
-  background-color: rgba(0, 0, 0, 0.03);
-  cursor: default;
+  background-color: rgba(0, 0, 0, 0.02);
+  cursor: col-resize; /* 始终显示调整列宽光标 */
   transition: background-color 0.2s ease;
   z-index: 10;
-  margin: 0 -2px;
+  margin: 0 -4px; /* 负外边距使点击区域更大 */
   position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 .resize-handle:hover,
 .resize-handle.hover {
-  cursor: col-resize;
-  background-color: rgba(151, 47, 246, 0.2);
+  background-color: rgba(151, 47, 246, 0.1);
 }
 
 .resize-handle.active {
-  background-color: rgba(151, 47, 246, 0.5);
+  background-color: rgba(151, 47, 246, 0.2);
 }
 
 .resize-handle::after {
@@ -1189,18 +1321,23 @@ export default {
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  height: 40px;
+  height: 60px; /* 墛大高度 */
   width: 2px;
-  background-color: rgba(151, 47, 246, 0.3);
+  background-color: rgba(151, 47, 246, 0.5);
   border-radius: 1px;
-  opacity: 0;
-  transition: opacity 0.2s ease;
+  transition: height 0.2s ease, background-color 0.2s ease;
 }
 
 .resize-handle:hover::after,
-.resize-handle.hover::after,
+.resize-handle.hover::after {
+  height: 80px; /* 悬停时增大高度 */
+  background-color: rgba(151, 47, 246, 0.7);
+}
+
 .resize-handle.active::after {
-  opacity: 1;
+  height: 120px; /* 拖拽时进一步增大高度 */
+  background-color: rgba(151, 47, 246, 0.9);
+  box-shadow: 0 0 8px rgba(151, 47, 246, 0.5);
 }
 
 .json-input-panel,
