@@ -11,13 +11,22 @@
   transform: translateZ(0);
   -webkit-font-smoothing: subpixel-antialiased;
   border: 1px solid rgba(255, 255, 255, 0.5); /* 添加边框增强深度感 */
+  transition: all 0.4s cubic-bezier(0.22, 1, 0.36, 1); /* 添加过渡效果 */
+  transform-origin: center;
+  position: relative;
+  z-index: 1;
+  transition: all 0.45s cubic-bezier(0.2, 1, 0.3, 1); /* 调整过渡效果 */
+  will-change: transform, opacity; /* 优化动画性能 */
 }
 
 .json-panel {
   height: 100%;
   display: flex;
   flex-direction: column;
-  transition: width 0.25s cubic-bezier(0.215, 0.61, 0.355, 1); 
+  transition: width 0.25s cubic-bezier(0.215, 0.61, 0.355, 1), 
+              background-color 0.4s ease,
+              border-radius 0.4s ease,
+              box-shadow 0.4s ease; 
   will-change: width;
   min-width: 200px;
 }
@@ -837,6 +846,11 @@
 
 .fullscreen-btn i {
   font-size: 14px;
+  transition: transform 0.3s ease;
+}
+
+.fullscreen-btn:hover i {
+  transform: scale(1.2);
 }
 
 /* 全屏模式样式 */
@@ -854,8 +868,29 @@
   /* 添加内边距，确保内容与浏览器边缘保持距离 */
   padding: 20px !important;
   box-sizing: border-box !important;
+  /* 添加动画效果的状态变化 */
+  transform: scale(1) !important;
+  opacity: 1 !important;
+  transition: all 0.45s cubic-bezier(0.2, 1, 0.3, 1) !important;
 }
 
+/* 全屏进入和退出动画 */
+.fullscreen-enter-active, .fullscreen-leave-active {
+  transition: all 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+  z-index: 9999;
+}
+
+.fullscreen-enter-from {
+  opacity: 0;
+  transform: scale(0.9);
+}
+
+.fullscreen-leave-to {
+  opacity: 0;
+  transform: scale(1.05);
+}
+
+/* 全屏模式下JSON面板的动画效果 */
 .fullscreen-mode .json-panel {
   /* 确保JSON面板在全屏模式下也有圆角 */
   border-radius: 16px !important;
@@ -863,6 +898,8 @@
   background-color: rgba(255, 255, 255, 0.6) !important;
   /* 为面板添加微妙的阴影 */
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.05) !important;
+  transition: all 0.4s cubic-bezier(0.22, 1, 0.36, 1) !important; /* 平滑过渡效果 */
+  transition: all 0.45s cubic-bezier(0.2, 1, 0.3, 1) !important;
 }
 
 .fullscreen-mode .resize-handle {
@@ -872,6 +909,81 @@
 /* 在全屏模式下调整左右面板宽度 */
 .fullscreen-mode .json-panel {
   transition: width 0.3s cubic-bezier(0.215, 0.61, 0.355, 1) !important;
+}
+
+/* 全屏模式相关样式优化 */
+.json-tool-container {
+  transition: all 0.45s cubic-bezier(0.2, 1, 0.3, 1); /* 调整过渡效果 */
+  transform-origin: center;
+  position: relative;
+  z-index: 1;
+  will-change: transform, opacity; /* 优化动画性能 */
+}
+
+/* 全屏模式样式 - 改进过渡效果 */
+.fullscreen-mode {
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  bottom: 0 !important;
+  width: 100vw !important;
+  height: 100vh !important;
+  z-index: 9999 !important;
+  border-radius: 0 !important;
+  background-color: rgba(245, 245, 250, 0.98) !important;
+  padding: 20px !important;
+  box-sizing: border-box !important;
+  transform: scale(1) !important;
+  opacity: 1 !important;
+}
+
+/* 移除不需要的全屏叠加层样式 */
+.fullscreen-overlay {
+  display: none !important;
+}
+
+/* 调整面板全屏模式样式，增强过渡效果 */
+.fullscreen-mode .json-panel {
+  border-radius: 16px !important;
+  background-color: rgba(255, 255, 255, 0.6) !important;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.05) !important;
+  transition: all 0.45s cubic-bezier(0.2, 1, 0.3, 1) !important;
+}
+
+/* 全屏按钮样式优化 */
+.fullscreen-btn i {
+  transition: transform 0.3s cubic-bezier(0.2, 1, 0.3, 1);
+}
+
+.fullscreen-btn:hover i {
+  transform: scale(1.2);
+}
+
+/* 退出全屏临时样式 - 为了增强动画效果 */
+.exiting-fullscreen {
+  transform: scale(0.95) !important;
+  opacity: 0.9 !important;
+  transition: all 0.45s cubic-bezier(0.2, 1, 0.3, 1) !important;
+}
+
+/* 全屏模式下的背景叠加效果 */
+.fullscreen-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(5px);
+  z-index: 9998;
+  opacity: 0;
+  transition: opacity 0.4s ease;
+  pointer-events: none;
+}
+
+.fullscreen-overlay.active {
+  opacity: 1;
 }
 
 /* 退出全屏按钮 */

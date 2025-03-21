@@ -1259,38 +1259,67 @@ export default {
     },
     
     enterFullScreen() {
-      // 保存当前状态以便退出全屏时恢复
+      // 保存当前状态
       this.previousPanelState = {
-        leftPanelWidth: this.leftPanelWidth
+        leftPanelWidth: this.leftPanelWidth,
+        containerRect: this.$el.getBoundingClientRect()
       };
-      
-      // 开启全屏模式
-      this.isFullScreen = true;
       
       // 防止滚动
       document.body.style.overflow = 'hidden';
       
-      // 确保面板分配合理
-      this.adjustPanelsWidth();
-      
-      // 通知用户进入全屏模式
-      ToastService.info('已进入全屏模式');
+      // 应用进入全屏前的初始缩小状态
+      requestAnimationFrame(() => {
+        // 先添加临时类实现初始缩小状态
+        this.$el.classList.add('entering-fullscreen');
+        this.$el.style.transform = 'scale(0.92)';
+        this.$el.style.opacity = '0.8';
+        
+        // 强制重绘
+        void this.$el.offsetWidth;
+        
+        // 启动进入动画
+        setTimeout(() => {
+          // 移除初始类，添加全屏类，实现放大动画
+          this.$el.classList.remove('entering-fullscreen');
+          this.$el.style.transform = '';
+          this.$el.style.opacity = '';
+          this.isFullScreen = true;
+          
+          // 确保面板分配合理
+          this.adjustPanelsWidth();
+          
+          // 通知用户
+          ToastService.info('已进入全屏模式');
+        }, 30);
+      });
     },
     
     exitFullScreen() {
-      // 退出全屏
-      this.isFullScreen = false;
-      
       // 恢复滚动
       document.body.style.overflow = '';
       
-      // 如果存在之前的状态，恢复
-      if (this.previousPanelState) {
-        this.leftPanelWidth = this.previousPanelState.leftPanelWidth;
-      }
-      
-      // 通知用户退出全屏模式
-      ToastService.info('已退出全屏模式');
+      // 应用退出动画
+      requestAnimationFrame(() => {
+        // 添加退出动画类
+        this.$el.classList.add('exiting-fullscreen');
+        
+        // 改变状态，移除全屏标记
+        this.isFullScreen = false;
+        
+        // 如果存在之前状态，恢复
+        if (this.previousPanelState) {
+          this.leftPanelWidth = this.previousPanelState.leftPanelWidth;
+        }
+        
+        // 动画完成后清理
+        setTimeout(() => {
+          this.$el.classList.remove('exiting-fullscreen');
+          
+          // 通知用户
+          ToastService.info('已退出全屏模式');
+        }, 450);
+      });
     },
     
     // ESC键处理函数

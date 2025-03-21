@@ -150,3 +150,19 @@ export default {
 <style src="@/styles/JsonToolStyle.css">
 /* 样式已移至 /src/styles/JsonToolStyle.css */
 </style>
+
+<style scoped>
+/* 添加进入全屏的初始状态样式 */
+.entering-fullscreen {
+  transform: scale(0.92);
+  opacity: 0.8;
+  transition: none !important;
+}
+
+/* 改进退出全屏动画样式 */
+.exiting-fullscreen {
+  transform: scale(0.95);
+  opacity: 0.9;
+  transition: all 0.45s cubic-bezier(0.2, 1, 0.3, 1) !important;
+}
+</style>
