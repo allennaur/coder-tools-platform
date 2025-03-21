@@ -59,6 +59,25 @@ export default {
       
       return `${localDate} ${localTime} (${timestamp})`;
     },
+    
+    // 添加检测结果是否存在的计算属性
+    hasTimestampResult() {
+      return !!this.localDateTimeResult;
+    },
+    
+    hasDateTimeResult() {
+      return !!this.secondsTimestampResult;
+    },
+    
+    // 获取当前时间戳（秒）
+    currentTimestamp() {
+      return Math.floor(this.currentTime.getTime() / 1000);
+    },
+    
+    // 获取当前时间戳（毫秒）
+    currentTimestampMs() {
+      return this.currentTime.getTime();
+    }
   },
   
   mounted() {
@@ -332,6 +351,13 @@ export default {
       }
       
       this.copyText(text);
+    },
+    
+    // 复制当前时间戳
+    copyCurrentTimestamp() {
+      const timestamp = this.currentTimestamp; // 使用秒级时间戳
+      this.copyText(timestamp.toString());
+      ToastService.success('已复制当前时间戳: ' + timestamp);
     },
     
     // 复制文本到剪贴板

@@ -219,19 +219,24 @@ input:checked + .toggle-slider:before {
 
 .precision-select {
   width: 100px;
-  background: rgba(0, 0, 0, 0.03);
+  background: transparent;
   border-left: 1px solid rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+  display: flex;
+  align-items: center;
 }
 
 .precision-select select {
   width: 100%;
   height: 100%;
   border: none;
-  padding: 0 8px;
+  padding: 0 8px 0 12px;
   outline: none;
   background: transparent;
   font-size: 14px;
   cursor: pointer;
+  color: #333;
+  margin: 0;
 }
 
 .date-time-inputs {
@@ -242,6 +247,10 @@ input:checked + .toggle-slider:before {
   overflow: hidden;
   background: white;
   padding: 10px 12px;
+  background: transparent;
+  border: none;
+  padding: 0;
+  width: 100%;
 }
 
 .date-time-inputs input {
@@ -249,6 +258,33 @@ input:checked + .toggle-slider:before {
   outline: none;
   width: 100%;
   font-size: 14px;
+}
+
+.date-time-inputs input[type="datetime-local"] {
+  width: 100%;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  border-radius: 12px;
+  padding: 8px 12px;
+  font-size: 14px;
+  color: #333;
+  background: rgba(255, 255, 255, 0.7);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.03);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  transition: all 0.2s ease;
+  appearance: none;
+  -webkit-appearance: none;
+  outline: none;
+}
+
+.date-time-inputs input[type="datetime-local"]:focus {
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(0, 122, 255, 0.2);
+  border-color: rgba(0, 122, 255, 0.4);
+}
+
+.date-time-inputs input[type="datetime-local"]:hover {
+  background-color: rgba(255, 255, 255, 0.9);
 }
 
 .result-container {
@@ -619,4 +655,211 @@ input:checked + .toggle-slider:before {
   .form-label {
     margin-bottom: 4px;
   }
+}
+
+/* 添加 VisionOS 风格的下拉菜单 */
+.visionos-select {
+  appearance: none;
+  -webkit-appearance: none;
+  background: rgba(255, 255, 255, 0.7);
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  border-radius: 12px;
+  padding: 8px 30px 8px 12px;
+  font-size: 14px;
+  color: #333;
+  cursor: pointer;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23666' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 10px center;
+  background-size: 16px;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.03);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+
+.visionos-select:focus {
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(0, 122, 255, 0.2);
+  border-color: rgba(0, 122, 255, 0.4);
+}
+
+.visionos-select:hover {
+  background-color: rgba(255, 255, 255, 0.9);
+}
+
+/* VisionOS 风格的日期时间选择器 */
+.visionos-datetime {
+  appearance: none;
+  -webkit-appearance: none;
+  background: rgba(255, 255, 255, 0.7);
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  border-radius: 12px;
+  padding: 8px 12px;
+  font-size: 14px;
+  color: #333;
+  width: 100%;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.03);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+
+.visionos-datetime:focus {
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(0, 122, 255, 0.2);
+  border-color: rgba(0, 122, 255, 0.4);
+}
+
+.visionos-datetime:hover {
+  background-color: rgba(255, 255, 255, 0.9);
+}
+
+/* VisionOS 风格的数字输入框 */
+.visionos-number {
+  appearance: none;
+  -webkit-appearance: none;
+  background: rgba(255, 255, 255, 0.7);
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  border-radius: 12px;
+  padding: 8px 12px;
+  font-size: 14px;
+  color: #333;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.03);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  text-align: center;
+}
+
+.visionos-number:focus {
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(0, 122, 255, 0.2);
+  border-color: rgba(0, 122, 255, 0.4);
+}
+
+.visionos-number:hover {
+  background-color: rgba(255, 255, 255, 0.9);
+}
+
+/* 优化表单输入框样式 */
+.form-input input[type="datetime-local"],
+.form-input select {
+  flex: 1;
+  border-radius: 12px;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  outline: none;
+  font-size: 14px;
+  background: rgba(255, 255, 255, 0.7);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.03);
+}
+
+/* 统一下拉菜单和日期选择器的UI风格 - 增强系统默认样式 */
+select,
+input[type="datetime-local"] {
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+}
+
+/* 覆盖浏览器默认的日期选择器样式 */
+::-webkit-calendar-picker-indicator {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23666' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='3' y='4' width='18' height='18' rx='2' ry='2'%3E%3C/rect%3E%3Cline x1='16' y1='2' x2='16' y2='6'%3E%3C/line%3E%3Cline x1='8' y1='2' x2='8' y2='6'%3E%3C/line%3E%3Cline x1='3' y1='10' x2='21' y2='10'%3E%3C/line%3E%3C/svg%3E");
+  width: 20px;
+  height: 20px;
+  cursor: pointer;
+  opacity: 0.7;
+  margin-right: 4px;
+  transition: opacity 0.2s ease;
+}
+
+::-webkit-calendar-picker-indicator:hover {
+  opacity: 1;
+}
+
+/* 统一所有日期时间输入框样式，包括基准时间和结束时间 */
+.form-input input[type="datetime-local"] {
+  appearance: none;
+  -webkit-appearance: none;
+  background: rgba(255, 255, 255, 0.7);
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  border-radius: 12px;
+  padding: 8px 12px;
+  font-size: 14px;
+  color: #333;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.03);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+
+.form-input input[type="datetime-local"]:focus {
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(0, 122, 255, 0.2);
+  border-color: rgba(0, 122, 255, 0.4);
+}
+
+.form-input input[type="datetime-local"]:hover {
+  background-color: rgba(255, 255, 255, 0.9);
+}
+
+/* 确保所有select元素使用统一的VisionOS样式 */
+select.visionos-select,
+.precision-select select,
+.form-input select {
+  appearance: none;
+  -webkit-appearance: none;
+  background-color: rgba(255, 255, 255, 0.7);
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  border-radius: 12px;
+  padding: 8px 30px 8px 12px;
+  font-size: 14px;
+  color: #333;
+  cursor: pointer;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23666' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 10px center;
+  background-size: 16px;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.03);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+
+.precision-select select:focus,
+.form-input select:focus {
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(0, 122, 255, 0.2);
+  border-color: rgba(0, 122, 255, 0.4);
+}
+
+.precision-select select:hover,
+.form-input select:hover {
+  background-color: rgba(255, 255, 255, 0.9);
+}
+
+/* 修改精度选择框，使其与VisionOS风格一致 */
+.precision-select {
+  width: 100px;
+  background: transparent;
+  border-left: 1px solid rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+}
+
+.precision-select select {
+  margin: 0;
+  height: 100%;
+}
+
+/* 使用CSS变量定义VisionOS风格的颜色和阴影 */
+:root {
+  --visionos-highlight-color: rgba(0, 122, 255, 0.2);
+  --visionos-border-color: rgba(0, 122, 255, 0.4);
+  --visionos-background-color: rgba(255, 255, 255, 0.7);
+  --visionos-hover-background: rgba(255, 255, 255, 0.9);
+  --visionos-shadow: 0 2px 6px rgba(0, 0, 0, 0.03);
+  --visionos-focus-shadow: 0 0 0 2px rgba(0, 122, 255, 0.2);
 }
